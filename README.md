@@ -1,13 +1,15 @@
 # FinanceManager
+
 Backend for a finance management application
 
 ## Models
-- User
-- Income
-- Expense
-- Goal
-- BankStatement
-- Notification
+
+-   User
+-   Income
+-   Expense
+-   Goal
+-   BankStatement
+-   Notification
 
 ### User
 
@@ -21,6 +23,36 @@ id, name, description?, frequency(weekly, daily, monthly, annualy), amount, date
 
 id, name, descryption?, frequency, amount, category?, date?
 
-### Goal
+### SavingsGoal
 
-id, name, description, 
+id, name, description, targetAmount, savedAmount, dueDate?, timePeriod?
+
+### Notification
+
+id, title, message, time, isRead
+
+### BankStatement
+
+id, startDate, endDate, .....
+
+### Income Category
+
+Salary, Allowance, Commision, Investment Income, Interest, Royalty
+
+## Functions
+
+### Authentication
+
+login, register, logout?
+
+### Income
+
+CRUD Income
+
+### Expense
+
+CRUD Expense
+
+### SavingsGoal
+
+CRUD SavingsGoal

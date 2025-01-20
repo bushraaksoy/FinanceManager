@@ -1,8 +1,6 @@
-
-
 class AuthController {
-    static function login(req, res)  {
-        const body = req.body
-
-    }
+    static async login(req, res) {}
+    static async register(req, res) {}
 }
+
+export default AuthController;

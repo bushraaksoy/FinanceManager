@@ -7,9 +7,87 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Frequency {
+  DAILY
+  WEEKLY
+  MONTHLY
+  YEARLY
+}
+
+enum IncomeCategory {
+  SALARY
+  ALLOWANCE
+  COMMISSION
+  INVESTMENT
+  INTEREST
+  ROYALTY
+  FREELANCE
+  OTHER
+}
+
+enum ExpenseCategory {
+  HOUSING
+  TRANSPORTATION
+  HEALTH
+  GROCERIES
+  CLOTHING
+  INSURANCE
+  OTHER
+}
+
 model User {
-  id String @id @default(uuid)
-  username String
-  password String 
-  email String? @unique
+  id        String    @id @default(uuid())
+  username  String    @unique
+  email     String?   @unique
+  password  String
+  dob       DateTime?
+  gender    String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Income {
+  id          Int             @id @default(autoincrement())
+  title       String
+  description String?
+  amount      Float
+  freqency    Frequency?
+  date        DateTime?
+  category    IncomeCategory?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+}
+
+model Expense {
+  id          Int              @id @default(autoincrement())
+  title       String
+  description String?
+  amount      Float
+  freqency    Frequency?
+  date        DateTime?
+  category    ExpenseCategory?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+}
+
+model SavingsGoal {
+  id             Int       @id @default(autoincrement())
+  title          String
+  description    String?
+  targetAmount   Float
+  savedAmount    Float?
+  dueDate        DateTime?
+  durationPeriod DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  title     String
+  message   String
+  time      DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isRead    Boolean
 }
