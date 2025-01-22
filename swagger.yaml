@@ -781,3 +781,271 @@ paths:
                                     error:
                                         type: string
                                         example: 'Error message'
+    /savings:
+        get:
+            tags:
+                - Saving
+            summary: Get all savings for a user
+            description: Returns a list of savings associated with the provided user ID.
+            responses:
+                '200':
+                    description: Successfully retrieved savings
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    savings:
+                                        type: array
+                                        items:
+                                            type: object
+                                            properties:
+                                                id:
+                                                    type: integer
+                                                amount:
+                                                    type: number
+                                                    format: float
+                                                userId:
+                                                    type: integer
+                                                createdAt:
+                                                    type: string
+                                                    format: date-time
+                                                updatedAt:
+                                                    type: string
+                                                    format: date-time
+                '500':
+                    description: Internal Server Error
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                    error:
+                                        type: string
+        post:
+            tags:
+                - Saving
+            summary: Add a new saving entry
+            description: Creates a new saving for the user with the provided data.
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                amount:
+                                    type: number
+                                    format: float
+                                userId:
+                                    type: integer
+                                goal:
+                                    type: string
+            responses:
+                '200':
+                    description: Successfully added saving
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                    saving:
+                                        type: object
+                                        properties:
+                                            id:
+                                                type: integer
+                                            amount:
+                                                type: number
+                                                format: float
+                                            userId:
+                                                type: integer
+                                            goal:
+                                                type: string
+                                            createdAt:
+                                                type: string
+                                                format: date-time
+                                            updatedAt:
+                                                type: string
+                                                format: date-time
+                '500':
+                    description: Internal Server Error
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                    error:
+                                        type: string
+
+    /savings/{savingId}:
+        get:
+            tags:
+                - Saving
+            summary: Get a specific saving entry by ID
+            description: Retrieves a saving entry for a user by the provided saving ID.
+            parameters:
+                - name: savingId
+                  in: path
+                  required: true
+                  description: The ID of the saving entry to retrieve
+                  schema:
+                      type: integer
+            responses:
+                '200':
+                    description: Successfully retrieved saving
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    saving:
+                                        type: object
+                                        properties:
+                                            id:
+                                                type: integer
+                                            amount:
+                                                type: number
+                                                format: float
+                                            userId:
+                                                type: integer
+                                            goal:
+                                                type: string
+                                            createdAt:
+                                                type: string
+                                                format: date-time
+                                            updatedAt:
+                                                type: string
+                                                format: date-time
+                '500':
+                    description: Internal Server Error
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                    error:
+                                        type: string
+
+        put:
+            tags:
+                - Saving
+            summary: Update an existing saving entry
+            description: Updates the saving details for the provided saving ID.
+            parameters:
+                - name: savingId
+                  in: path
+                  required: true
+                  description: The ID of the saving entry to update
+                  schema:
+                      type: integer
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                amount:
+                                    type: number
+                                    format: float
+                                goal:
+                                    type: string
+            responses:
+                '200':
+                    description: Successfully updated saving
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                    saving:
+                                        type: object
+                                        properties:
+                                            id:
+                                                type: integer
+                                            amount:
+                                                type: number
+                                                format: float
+                                            userId:
+                                                type: integer
+                                            goal:
+                                                type: string
+                                            createdAt:
+                                                type: string
+                                                format: date-time
+                                            updatedAt:
+                                                type: string
+                                                format: date-time
+                '500':
+                    description: Internal Server Error
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                    error:
+                                        type: string
+
+        delete:
+            tags:
+                - Saving
+            summary: Delete a saving entry
+            description: Deletes the saving entry with the provided saving ID.
+            parameters:
+                - name: savingId
+                  in: path
+                  required: true
+                  description: The ID of the saving entry to delete
+                  schema:
+                      type: integer
+            responses:
+                '200':
+                    description: Successfully deleted saving
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                    saving:
+                                        type: object
+                                        properties:
+                                            id:
+                                                type: integer
+                                            amount:
+                                                type: number
+                                                format: float
+                                            userId:
+                                                type: integer
+                                            goal:
+                                                type: string
+                                            createdAt:
+                                                type: string
+                                                format: date-time
+                                            updatedAt:
+                                                type: string
+                                                format: date-time
+                '500':
+                    description: Internal Server Error
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                    error:
+                                        type: string
