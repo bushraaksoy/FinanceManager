@@ -35,6 +35,11 @@ enum ExpenseCategory {
   OTHER
 }
 
+enum NotificationType {
+  REMINDER
+  ALERT
+}
+
 model User {
   id            String         @id @default(uuid())
   username      String         @unique
@@ -46,7 +51,7 @@ model User {
   updatedAt     DateTime       @updatedAt
   incomes       Income[]
   expenses      Expense[]
-  savingsGoals  SavingsGoal[]
+  savings       Saving[]
   notifications Notification[]
 }
 
@@ -55,7 +60,7 @@ model Income {
   title       String
   description String?
   amount      Float
-  freqency    Frequency?
+  frequency   Frequency?
   date        DateTime?
   category    IncomeCategory?
   createdAt   DateTime        @default(now())
@@ -69,7 +74,7 @@ model Expense {
   title       String
   description String?
   amount      Float
-  freqency    Frequency?
+  frequency   Frequency?
   date        DateTime?
   category    ExpenseCategory?
   createdAt   DateTime         @default(now())
@@ -78,7 +83,7 @@ model Expense {
   userId      String
 }
 
-model SavingsGoal {
+model Saving {
   id             Int       @id @default(autoincrement())
   title          String
   description    String?

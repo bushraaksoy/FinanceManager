@@ -1,0 +1,783 @@
+openapi: 3.0.0
+info:
+    title: Authentication API
+    version: 1.0.0
+    description: API documentation for authentication endpoints
+servers:
+    - url: http://localhost:3002/api/v1
+tags:
+    - name: Authentication
+      description: Endpoints related to user authentication
+    - name: User
+      description: Endpoints for user management
+    - name: Income
+      description: Endpoints for managing income
+    - name: Expense
+      description: Endpoints for managing expenses
+    - name: Saving
+      description: Endpoints for managing savings
+paths:
+    /auth/login:
+        post:
+            tags:
+                - Authentication
+            summary: User login
+            description: Logs in a user with a username and password.
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                username:
+                                    type: string
+                                    example: 'testuser'
+                                password:
+                                    type: string
+                                    example: 'password123'
+            responses:
+                200:
+                    description: Logged in successfully.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'Logged in successfully'
+                500:
+                    description: Server error.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'Server Error'
+    /auth/register:
+        post:
+            tags:
+                - Authentication
+            summary: User registration
+            description: Registers a new user with a username and password.
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                username:
+                                    type: string
+                                    example: 'newuser'
+                                password:
+                                    type: string
+                                    example: 'password123'
+            responses:
+                200:
+                    description: User registered successfully.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'User registered successfully!'
+                500:
+                    description: Server error.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'Server Error'
+    /users:
+        get:
+            tags:
+                - User
+            summary: Get all users
+            description: Fetches all users ordered by creation date in descending order.
+            responses:
+                200:
+                    description: List of users retrieved successfully.
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    type: object
+                                    properties:
+                                        id:
+                                            type: string
+                                            example: '12345'
+                                        username:
+                                            type: string
+                                            example: 'johndoe'
+                                        createdAt:
+                                            type: string
+                                            format: date-time
+                                            example: '2025-01-21T10:30:00Z'
+                500:
+                    description: Server error.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'Server Error'
+                                    error:
+                                        type: string
+                                        example: 'Error message'
+    /users/{userId}:
+        get:
+            tags:
+                - User
+            summary: Get a single user
+            description: Fetches a user by their ID.
+            parameters:
+                - name: userId
+                  in: path
+                  required: true
+                  schema:
+                      type: string
+                  example: '12345'
+            responses:
+                200:
+                    description: User retrieved successfully.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    id:
+                                        type: string
+                                        example: '12345'
+                                    username:
+                                        type: string
+                                        example: 'johndoe'
+                                    createdAt:
+                                        type: string
+                                        format: date-time
+                                        example: '2025-01-21T10:30:00Z'
+                404:
+                    description: User not found.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'User does not exist'
+                500:
+                    description: Server error.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'Server Error'
+                                    error:
+                                        type: string
+                                        example: 'Error message'
+    /incomes:
+        get:
+            tags:
+                - Income
+            summary: Get all incomes
+            description: Fetches all incomes for the logged-in user based on the `user-id` header.
+            parameters:
+                - name: user-id
+                  in: header
+                  required: true
+                  schema:
+                      type: string
+                      example: '12345'
+            responses:
+                200:
+                    description: List of incomes retrieved successfully.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    incomes:
+                                        type: array
+                                        items:
+                                            type: object
+                                            properties:
+                                                id:
+                                                    type: integer
+                                                    example: 1
+                                                amount:
+                                                    type: number
+                                                    format: double
+                                                    example: 5000.0
+                                                description:
+                                                    type: string
+                                                    example: 'Salary for January'
+                                                createdAt:
+                                                    type: string
+                                                    format: date-time
+                                                    example: '2025-01-20T10:00:00Z'
+                500:
+                    description: Server error.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'Server Error'
+                                    error:
+                                        type: string
+                                        example: 'Error message'
+        post:
+            tags:
+                - Income
+            summary: Add an income
+            description: Creates a new income entry for the logged-in user.
+            parameters:
+                - name: user-id
+                  in: header
+                  required: true
+                  schema:
+                      type: string
+                      example: '12345'
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                amount:
+                                    type: number
+                                    format: double
+                                    example: 5000.0
+                                description:
+                                    type: string
+                                    example: 'Freelance project'
+            responses:
+                200:
+                    description: Income added successfully.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'Income added successfully!'
+                                    income:
+                                        type: object
+                                        properties:
+                                            id:
+                                                type: integer
+                                                example: 1
+                                            amount:
+                                                type: number
+                                                format: double
+                                                example: 5000.0
+                                            description:
+                                                type: string
+                                                example: 'Freelance project'
+                                            createdAt:
+                                                type: string
+                                                format: date-time
+                                                example: '2025-01-20T10:00:00Z'
+                500:
+                    description: Server error.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'Server Error'
+                                    error:
+                                        type: string
+                                        example: 'Error message'
+    /incomes/{incomeId}:
+        get:
+            tags:
+                - Income
+            summary: Get a single income
+            description: Retrieves details of a specific income by its ID.
+            parameters:
+                - name: incomeId
+                  in: path
+                  required: true
+                  schema:
+                      type: integer
+                      example: 1
+            responses:
+                200:
+                    description: Income retrieved successfully.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    income:
+                                        type: object
+                                        properties:
+                                            id:
+                                                type: integer
+                                                example: 1
+                                            amount:
+                                                type: number
+                                                format: double
+                                                example: 5000.0
+                                            description:
+                                                type: string
+                                                example: 'Freelance project'
+                                            createdAt:
+                                                type: string
+                                                format: date-time
+                                                example: '2025-01-20T10:00:00Z'
+                500:
+                    description: Server error.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'Server Error'
+                                    error:
+                                        type: string
+                                        example: 'Error message'
+        put:
+            tags:
+                - Income
+            summary: Update an income
+            description: Updates details of a specific income by its ID.
+            parameters:
+                - name: incomeId
+                  in: path
+                  required: true
+                  schema:
+                      type: integer
+                      example: 1
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                amount:
+                                    type: number
+                                    format: double
+                                    example: 5500.0
+                                description:
+                                    type: string
+                                    example: 'Updated freelance project'
+            responses:
+                200:
+                    description: Income updated successfully.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'Income updated successfully!'
+                                    income:
+                                        type: object
+                                        properties:
+                                            id:
+                                                type: integer
+                                                example: 1
+                                            amount:
+                                                type: number
+                                                format: double
+                                                example: 5500.0
+                                            description:
+                                                type: string
+                                                example: 'Updated freelance project'
+                500:
+                    description: Server error.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'Server Error'
+                                    error:
+                                        type: string
+                                        example: 'Error message'
+        delete:
+            tags:
+                - Income
+            summary: Delete an income
+            description: Deletes a specific income by its ID.
+            parameters:
+                - name: incomeId
+                  in: path
+                  required: true
+                  schema:
+                      type: integer
+                      example: 1
+            responses:
+                200:
+                    description: Income deleted successfully.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'Income deleted successfully'
+                                    income:
+                                        type: object
+                                        properties:
+                                            id:
+                                                type: integer
+                                                example: 1
+                                            amount:
+                                                type: number
+                                                format: double
+                                                example: 5000.0
+                                            description:
+                                                type: string
+                                                example: 'Freelance project'
+                500:
+                    description: Server error.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'Server Error'
+                                    error:
+                                        type: string
+                                        example: 'Error message'
+    /expenses:
+        get:
+            tags:
+                - Expense
+            summary: Get all expenses
+            description: Retrieves all expenses for the user identified by the `user-id` header.
+            parameters:
+                - name: user-id
+                  in: header
+                  required: true
+                  description: ID of the user whose expenses are to be retrieved.
+                  schema:
+                      type: string
+                      example: '12345'
+            responses:
+                200:
+                    description: List of expenses retrieved successfully.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    expenses:
+                                        type: array
+                                        items:
+                                            type: object
+                                            properties:
+                                                id:
+                                                    type: integer
+                                                    example: 1
+                                                description:
+                                                    type: string
+                                                    example: 'Grocery shopping'
+                                                amount:
+                                                    type: number
+                                                    format: float
+                                                    example: 100.50
+                                                date:
+                                                    type: string
+                                                    format: date
+                                                    example: '2025-01-21'
+                500:
+                    description: Server error.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'Server Error'
+                                    error:
+                                        type: string
+                                        example: 'Error message'
+
+        post:
+            tags:
+                - Expense
+            summary: Add a new expense
+            description: Creates a new expense entry for the user identified by the `user-id` header.
+            parameters:
+                - name: user-id
+                  in: header
+                  required: true
+                  description: ID of the user adding the expense.
+                  schema:
+                      type: string
+                      example: '12345'
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                description:
+                                    type: string
+                                    example: 'Electricity bill'
+                                amount:
+                                    type: number
+                                    format: float
+                                    example: 200.75
+                                date:
+                                    type: string
+                                    format: date
+                                    example: '2025-01-22'
+            responses:
+                200:
+                    description: Expense added successfully.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'Expense added successfully!'
+                                    expense:
+                                        type: object
+                                        properties:
+                                            id:
+                                                type: integer
+                                                example: 1
+                                            description:
+                                                type: string
+                                                example: 'Electricity bill'
+                                            amount:
+                                                type: number
+                                                format: float
+                                                example: 200.75
+                                            date:
+                                                type: string
+                                                format: date
+                                                example: '2025-01-22'
+                500:
+                    description: Server error.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'Server Error'
+                                    error:
+                                        type: string
+                                        example: 'Error message'
+
+    /expenses/{expenseId}:
+        get:
+            tags:
+                - Expense
+            summary: Get a specific expense
+            description: Retrieves a specific expense by its ID.
+            parameters:
+                - name: expenseId
+                  in: path
+                  required: true
+                  description: ID of the expense to retrieve.
+                  schema:
+                      type: integer
+                      example: 1
+            responses:
+                200:
+                    description: Expense retrieved successfully.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    expense:
+                                        type: object
+                                        properties:
+                                            id:
+                                                type: integer
+                                                example: 1
+                                            description:
+                                                type: string
+                                                example: 'Electricity bill'
+                                            amount:
+                                                type: number
+                                                format: float
+                                                example: 200.75
+                                            date:
+                                                type: string
+                                                format: date
+                                                example: '2025-01-22'
+                500:
+                    description: Server error.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'Server Error'
+                                    error:
+                                        type: string
+                                        example: 'Error message'
+
+        put:
+            tags:
+                - Expense
+            summary: Update a specific expense
+            description: Updates an existing expense by its ID.
+            parameters:
+                - name: expenseId
+                  in: path
+                  required: true
+                  description: ID of the expense to update.
+                  schema:
+                      type: integer
+                      example: 1
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                description:
+                                    type: string
+                                    example: 'Updated expense description'
+                                amount:
+                                    type: number
+                                    format: float
+                                    example: 300.50
+                                date:
+                                    type: string
+                                    format: date
+                                    example: '2025-01-23'
+            responses:
+                200:
+                    description: Expense updated successfully.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'Expense updated successfully!'
+                                    expense:
+                                        type: object
+                                        properties:
+                                            id:
+                                                type: integer
+                                                example: 1
+                                            description:
+                                                type: string
+                                                example: 'Updated expense description'
+                                            amount:
+                                                type: number
+                                                format: float
+                                                example: 300.50
+                                            date:
+                                                type: string
+                                                format: date
+                                                example: '2025-01-23'
+                500:
+                    description: Server error.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'Server Error'
+                                    error:
+                                        type: string
+                                        example: 'Error message'
+
+        delete:
+            tags:
+                - Expense
+            summary: Delete a specific expense
+            description: Deletes an expense by its ID.
+            parameters:
+                - name: expenseId
+                  in: path
+                  required: true
+                  description: ID of the expense to delete.
+                  schema:
+                      type: integer
+                      example: 1
+            responses:
+                200:
+                    description: Expense deleted successfully.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'Expense deleted successfully'
+                                    expense:
+                                        type: object
+                                        properties:
+                                            id:
+                                                type: integer
+                                                example: 1
+                                            description:
+                                                type: string
+                                                example: 'Electricity bill'
+                                            amount:
+                                                type: number
+                                                format: float
+                                                example: 200.75
+                                            date:
+                                                type: string
+                                                format: date
+                                                example: '2025-01-22'
+                500:
+                    description: Server error.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'Server Error'
+                                    error:
+                                        type: string
+                                        example: 'Error message'
