@@ -76,33 +76,42 @@ model Income {
 }
 
 model Expense {
-  id              Int              @id @default(autoincrement())
-  title           String
-  description     String?
-  amount          Float
-  frequency       Frequency?
-  date            DateTime?
-  category        ExpenseCategory?
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
-  user            User             @relation(fields: [userId], references: [id])
-  userId          String
-  monthlyExpenses MonthlyExpense[]
+  id          Int              @id @default(autoincrement())
+  title       String
+  description String?
+  amount      Float
+  frequency   Frequency?
+  date        DateTime?
+  category    ExpenseCategory?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  user        User             @relation(fields: [userId], references: [id])
+  userId      String
 }
 
 model Saving {
-  id             Int       @id @default(autoincrement())
-  title          String
-  description    String?
-  targetAmount   Float
-  savedAmount    Float?
-  savingPerMonth Float?
-  dueDate        DateTime?
-  durationPeriod Int?
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
-  user           User      @relation(fields: [userId], references: [id])
-  userId         String
+  id                  Int             @id @default(autoincrement())
+  title               String
+  description         String?
+  targetAmount        Float
+  savedAmount         Float?
+  monthlySavingAmount Float? //! TODO: find a better name
+  dueDate             DateTime?
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
+  user                User            @relation(fields: [userId], references: [id])
+  userId              String
+  savingHistory       SavingHistory[]
+}
+
+model SavingHistory {
+  id        Int      @id @default(autoincrement())
+  amount    Float
+  date      DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  saving    Saving   @relation(fields: [savingId], references: [id])
+  savingId  Int
 }
 
 model Notification {
