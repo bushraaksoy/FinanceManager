@@ -32,10 +32,10 @@ paths:
                             properties:
                                 username:
                                     type: string
-                                    example: 'testuser'
+                                    example: 'bushraaksoy'
                                 password:
                                     type: string
-                                    example: 'password123'
+                                    example: 'password'
             responses:
                 200:
                     description: Logged in successfully.
@@ -47,6 +47,9 @@ paths:
                                     message:
                                         type: string
                                         example: 'Logged in successfully'
+                                    userId:
+                                        type: string
+                                        example: 'ad0c8b40-7a7e-42be-bc41-adc6f3a9f651'
                 500:
                     description: Server error.
                     content:

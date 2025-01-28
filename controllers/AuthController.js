@@ -11,7 +11,10 @@ class AuthController {
             });
             const isMatch = bcrypt.compare(password, user.password);
             if (isMatch) {
-                res.status(200).send({ message: 'Logged in successfully' });
+                res.status(200).send({
+                    message: 'Logged in successfully',
+                    userId: user.id,
+                });
             }
         } catch (error) {
             console.log('Server error in login: ', error);
