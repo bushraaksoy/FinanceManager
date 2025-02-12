@@ -68,7 +68,6 @@ class AuthController {
                 data: {
                     username: body.username,
                     password: hash,
-                    fullname: body.fullname,
                 },
             });
             console.log('User created successfully');

@@ -95,9 +95,6 @@ paths:
                                 password:
                                     type: string
                                     example: 'password123'
-                                fullname:
-                                    type: string
-                                    example: 'Bushra Aksoy'
             responses:
                 200:
                     description: User registered successfully.
@@ -174,6 +171,7 @@ paths:
                                             type: string
                                             format: date-time
                                             example: '2025-01-21T10:30:00Z'
+
                 500:
                     description: Server error.
                     content:
