@@ -18,7 +18,7 @@ class AuthController {
             });
             if (!user) {
                 res.status(401).send({
-                    message: 'Invalid username of password',
+                    message: 'Invalid username or password',
                 });
                 return;
             }
@@ -54,20 +54,21 @@ class AuthController {
     static async register(req, res) {
         try {
             const body = req.body;
+            console.log(body);
             const existingUser = await prisma.user.findUnique({
                 where: { username: body.username },
             });
             if (existingUser) {
-                res.status(409).send({
+                return res.status(409).send({
                     message: 'A user with that username already exists',
                 });
-                return;
             }
             const hash = await bcrypt.hash(body.password, 10);
             const user = await prisma.user.create({
                 data: {
                     username: body.username,
                     password: hash,
+                    fullname: body.fullname,
                 },
             });
             console.log('User created successfully');

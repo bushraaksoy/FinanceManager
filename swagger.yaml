@@ -50,6 +50,22 @@ paths:
                                     userId:
                                         type: string
                                         example: 'ad0c8b40-7a7e-42be-bc41-adc6f3a9f651'
+                                    access_token:
+                                        type: string
+                                        example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyYzc4ZTJkZS1kMDRhLTQ5ZWEtOGFmOC03ZmFjNjhhNjNmZTUiLCJpYXQiOjE3MzkzNzAzODUsImV4cCI6MTczOTQ1Njc4NX0.d2WDZb8I6vwhLw99qMq6HMTj_899x6_QgKv7fC_X1_M'
+                                    refresh_token:
+                                        type: string
+                                        example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyYzc4ZTJkZS1kMDRhLTQ5ZWEtOGFmOC03ZmFjNjhhNjNmZTUiLCJpYXQiOjE3MzkzNzAzODUsImV4cCI6MTc0MDU3OTk4NX0.b4ZSqglMQRy_0B1v1aJwETRg1ra519qIRZ0ZvLFKvM4'
+                401:
+                    description: Unauthorized
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'Invalid username or password'
                 500:
                     description: Server error.
                     content:
@@ -79,6 +95,9 @@ paths:
                                 password:
                                     type: string
                                     example: 'password123'
+                                fullname:
+                                    type: string
+                                    example: 'Bushra Aksoy'
             responses:
                 200:
                     description: User registered successfully.
