@@ -1,4 +1,5 @@
 import prisma from '../db/db.config.js';
+import { calculateMonthlySaving } from '../utils/savingUtils.js';
 
 class SavingController {
     static async getAllSavings(req, res) {
@@ -35,8 +36,15 @@ class SavingController {
             const userId = req.headers['user-id'];
             const data = req.body;
             console.log('data ', data);
+            const savedAmount = 0;
+            // TODO: saved_amount = 0 (defualt) calculate MonthlySaving
+            const monthlySaving = calculateMonthlySaving(
+                data.targetAmount,
+                savedAmount,
+                data.dueDate
+            );
             const saving = await prisma.saving.create({
-                data: { ...data, userId },
+                data: { ...data, savedAmount, monthlySaving, userId },
             });
             res.status(200).send({
                 message: 'Saving added successfully!',

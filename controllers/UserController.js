@@ -24,7 +24,7 @@ class UserController {
                 where: { id: userId },
             });
             if (!user) {
-                res.status(404).json({ message: 'User does not exist' });
+                return res.status(404).json({ message: 'User does not exist' });
             }
             res.status(200).json(user);
         } catch (error) {
@@ -47,7 +47,10 @@ class UserController {
 
             console.log('User updated successfully!', user);
             res.status(200).send({});
-        } catch (error) {}
+        } catch (error) {
+            console.log('Server Error: ', error);
+            res.status(500).send('An error occured');
+        }
     }
 }
 

@@ -36,9 +36,10 @@ class ExpenseController {
         try {
             const userId = req.headers['user-id'];
             const data = req.body;
+            const category = data.category ? data.category : 'OTHER';
             console.log('data ', data);
             const expense = await prisma.expense.create({
-                data: { ...data, userId },
+                data: { ...data, userId, category },
             });
             res.status(200).send({
                 message: 'Expense added successfully!',
@@ -82,6 +83,33 @@ class ExpenseController {
                 message: 'Expense deleted successfully',
                 expense,
             });
+        } catch (error) {
+            console.error(error);
+            res.status(500).send({
+                message: 'Server Error',
+                error: error.message,
+            });
+        }
+    }
+    static async getExpenseCategories(req, res) {
+        try {
+            const userId = req.headers['user-id'];
+            const expenses = await prisma.expense.findMany({
+                where: { userId },
+            });
+
+            const groupedExpenses = expenses.reduce((acc, expense) => {
+                const categoryName = expense.category || 'OTHER';
+
+                if (!acc[categoryName]) {
+                    acc[categoryName] = [];
+                }
+
+                acc[categoryName].push(expense);
+                return acc;
+            }, {});
+
+            res.status(200).send(groupedExpenses);
         } catch (error) {
             console.error(error);
             res.status(500).send({
