@@ -109,6 +109,16 @@ paths:
                                     message:
                                         type: string
                                         example: 'User registered successfully!'
+                409:
+                    description: User already exists.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'A user with that username already exists'
                 500:
                     description: Server error.
                     content:
@@ -118,7 +128,7 @@ paths:
                                 properties:
                                     message:
                                         type: string
-                                        example: 'Server Error'
+                                        example: 'Internal Server Error'
     /users:
         get:
             tags:
@@ -137,11 +147,30 @@ paths:
                                     properties:
                                         id:
                                             type: string
-                                            example: '12345'
+                                            example: '28c20116-f286-47ac-a301-16a63d742671'
                                         username:
                                             type: string
-                                            example: 'johndoe'
+                                            example: 'bushraaksoy'
+                                        email:
+                                            type: string
+                                            example: null
+                                        fullname:
+                                            type: string
+                                            example: 'Bushra Aksoy'
+                                        password:
+                                            type: string
+                                            example: '$2b$10$wOtaSnAClnIpYlrmSOIuIOK4U9yL2TMfRQUCkqBowUcsyRjfzkSmy'
+                                        dob:
+                                            type: date-time
+                                            example: '2003-07-17T13:37:53.403Z'
+                                        gender:
+                                            type: string
+                                            example: 'Female'
                                         createdAt:
+                                            type: string
+                                            format: date-time
+                                            example: '2025-01-21T10:30:00Z'
+                                        updatedAt:
                                             type: string
                                             format: date-time
                                             example: '2025-01-21T10:30:00Z'
@@ -170,7 +199,7 @@ paths:
                   required: true
                   schema:
                       type: string
-                  example: '12345'
+                  example: '28c20116-f286-47ac-a301-16a63d742671'
             responses:
                 200:
                     description: User retrieved successfully.
@@ -181,11 +210,30 @@ paths:
                                 properties:
                                     id:
                                         type: string
-                                        example: '12345'
+                                        example: '28c20116-f286-47ac-a301-16a63d742671'
                                     username:
                                         type: string
-                                        example: 'johndoe'
+                                        example: 'bushraaksoy'
+                                    email:
+                                        type: string
+                                        example: null
+                                    fullname:
+                                        type: string
+                                        example: 'Bushra Aksoy'
+                                    password:
+                                        type: string
+                                        example: '$2b$10$wOtaSnAClnIpYlrmSOIuIOK4U9yL2TMfRQUCkqBowUcsyRjfzkSmy'
+                                    dob:
+                                        type: date-time
+                                        example: '2003-07-17T13:37:53.403Z'
+                                    gender:
+                                        type: string
+                                        example: 'Female'
                                     createdAt:
+                                        type: string
+                                        format: date-time
+                                        example: '2025-01-21T10:30:00Z'
+                                    updatedAt:
                                         type: string
                                         format: date-time
                                         example: '2025-01-21T10:30:00Z'
