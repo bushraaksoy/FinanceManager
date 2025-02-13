@@ -7,9 +7,6 @@ transactionRouter.get(
     '/transaction-history',
     TransactionController.getTransactionHistory
 );
-transactionRouter.post(
-    '/add-transaction',
-    TransactionController.addTransaction
-);
+transactionRouter.post('/transactions', TransactionController.addTransaction);
 
 export default transactionRouter;

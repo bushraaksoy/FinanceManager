@@ -1286,3 +1286,44 @@ paths:
                                     message:
                                         type: string
                                         example: 'An error occured'
+    /transaction-history:
+        get:
+            tags:
+                - Transaction
+            summary: Get Transaction History
+            description: Retrieves the user's transaction history of the current month.
+            parameters:
+                - name: userId
+                  in: header
+                  required: true
+                  schema:
+                      type: string
+                      example: 28c20116-f286-47ac-a301-16a63d742671
+            responses:
+                200:
+                    description: Transaction History retreived successfully
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    type: object
+                                    properties:
+                                        id:
+                                            type: number
+                                            example: 1
+                                        amount:
+                                            type: number
+                                            format: float
+                                            example: '12.25'
+                                        type:
+                                            type: string
+                                            example: 'EXPENSE'
+                                        createdAt:
+                                            type: string
+                                            format: date-time
+                                            example: '2025-02-13T11:41:43.461Z'
+                                        updatedAt:
+                                            type: string
+                                            format: date-time
+                                            example: '2025-02-13T11:41:43.461Z'
