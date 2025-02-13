@@ -1286,7 +1286,7 @@ paths:
                                     message:
                                         type: string
                                         example: 'An error occured'
-    /transaction-history:
+    /transactions:
         get:
             tags:
                 - Transaction
@@ -1327,3 +1327,82 @@ paths:
                                             type: string
                                             format: date-time
                                             example: '2025-02-13T11:41:43.461Z'
+                500:
+                    description: Server error.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'Server Error'
+                                    error:
+                                        type: string
+                                        example: 'Error message'
+        post:
+            tags:
+                - Transaction
+            summary: Get Transaction History
+            description: Retrieves the user's transaction history of the current month.
+            parameters:
+                - name: userId
+                  in: header
+                  required: true
+                  schema:
+                      type: string
+                      example: 28c20116-f286-47ac-a301-16a63d742671
+                - name: type
+                  in: query
+                  required: true
+                  schema:
+                      type: string
+                      example: 'SAVING or EXPENSE'
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                expenseId:
+                                    type: number
+                                    example: '1'
+                                amount:
+                                    type: number
+                                    format: float
+                                    example: '12.25'
+            responses:
+                200:
+                    description: Successfuly Added
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'Transaction added successfully!'
+                400:
+                    description: Invalid type
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'Specify valid type param'
+                500:
+                    description: Server error.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'Server Error'
+                                    error:
+                                        type: string
+                                        example: 'Error message'

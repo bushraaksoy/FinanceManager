@@ -3,10 +3,7 @@ import { TransactionController } from '../controllers/index.js';
 
 const transactionRouter = Router();
 
-transactionRouter.get(
-    '/transaction-history',
-    TransactionController.getTransactionHistory
-);
-transactionRouter.post('/transactions', TransactionController.addTransaction);
+transactionRouter.get('', TransactionController.getTransactionHistory);
+transactionRouter.post('', TransactionController.addTransaction);
 
 export default transactionRouter;

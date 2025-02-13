@@ -22,7 +22,7 @@ router.use('/profile', profileRouter);
 router.use('/incomes', incomeRouter);
 router.use('', expenseRouter);
 router.use('/savings', savingsRouter);
-router.use('', transactionRouter);
+router.use('/transactions', transactionRouter);
 router.use('/analytics', analyticsRouter);
 
 export default router;
