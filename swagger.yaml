@@ -1230,3 +1230,59 @@ paths:
                                     message:
                                         type: string
                                         example: 'An error occured'
+        post:
+            tags:
+                - Profile
+            summary: Update profile
+            description: Retrieves the user profile based on the user ID.
+            parameters:
+                - name: userId
+                  in: header
+                  required: true
+                  schema:
+                      type: string
+                      example: 28c20116-f286-47ac-a301-16a63d742671
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                fullname:
+                                    type: string
+                                    example: 'John Doe'
+                                gender:
+                                    type: string
+                                    example: 'Male'
+            responses:
+                200:
+                    description: Successful Update
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'User profile updated successfully'
+                400:
+                    description: Invalid User
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'User ID is missing'
+                500:
+                    description: Internal Server Error
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'An error occured'
