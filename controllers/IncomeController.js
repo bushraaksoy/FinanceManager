@@ -5,7 +5,7 @@ class IncomeController {
         try {
             const userId = req.headers['user-id'];
             const incomes = await prisma.income.findMany({ where: { userId } });
-            res.status(200).send({ incomes: incomes });
+            res.status(200).send(incomes);
         } catch (error) {
             console.error(error);
             res.status(500).send({
@@ -21,7 +21,7 @@ class IncomeController {
             const income = await prisma.income.findUnique({
                 where: { id: +incomeId },
             });
-            res.status(200).send({ income });
+            res.status(200).send(income);
         } catch (error) {
             console.error(error);
             res.status(500).send({

@@ -4,10 +4,10 @@ import { SavingController } from '../controllers/index.js';
 const savingRouter = Router();
 
 // Savings
-savingRouter.get('/savings', SavingController.getAllSavings);
-savingRouter.post('/savings', SavingController.addSaving);
-savingRouter.get('/savings/:savingsId', SavingController.getSaving);
-savingRouter.put('/savings/:savingsId', SavingController.updateSaving);
-savingRouter.delete('/savings/:savingsId', SavingController.deleteSaving);
+savingRouter.get('/', SavingController.getAllSavings);
+savingRouter.post('/', SavingController.addSaving);
+savingRouter.get('/:savingsId', SavingController.getSaving);
+savingRouter.put('/:savingsId', SavingController.updateSaving);
+savingRouter.delete('/:savingsId', SavingController.deleteSaving);
 
 export default savingRouter;

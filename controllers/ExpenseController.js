@@ -7,7 +7,7 @@ class ExpenseController {
             const expenses = await prisma.expense.findMany({
                 where: { userId },
             });
-            res.status(200).send({ expenses: expenses });
+            res.status(200).send(expenses);
         } catch (error) {
             console.error(error);
             res.status(500).send({
@@ -23,7 +23,7 @@ class ExpenseController {
             const expense = await prisma.expense.findUnique({
                 where: { id: +expenseId },
             });
-            res.status(200).send({ expense });
+            res.status(200).send(expense);
         } catch (error) {
             console.error(error);
             res.status(500).send({

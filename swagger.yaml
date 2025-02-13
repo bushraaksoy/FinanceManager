@@ -270,34 +270,47 @@ paths:
                   required: true
                   schema:
                       type: string
-                      example: '12345'
+                      example: '28c20116-f286-47ac-a301-16a63d742671'
             responses:
                 200:
                     description: List of incomes retrieved successfully.
                     content:
                         application/json:
                             schema:
-                                type: object
-                                properties:
-                                    incomes:
-                                        type: array
-                                        items:
-                                            type: object
-                                            properties:
-                                                id:
-                                                    type: integer
-                                                    example: 1
-                                                amount:
-                                                    type: number
-                                                    format: double
-                                                    example: 5000.0
-                                                description:
-                                                    type: string
-                                                    example: 'Salary for January'
-                                                createdAt:
-                                                    type: string
-                                                    format: date-time
-                                                    example: '2025-01-20T10:00:00Z'
+                                type: array
+                                items:
+                                    type: object
+                                    properties:
+                                        id:
+                                            type: integer
+                                            example: 1
+                                        amount:
+                                            type: number
+                                            format: double
+                                            example: 5000.0
+                                        description:
+                                            type: string
+                                            example: 'Salary for January'
+                                        frequency:
+                                            type: string
+                                            example: 'MONTHLY'
+                                        date:
+                                            type: date-time
+                                            example: null
+                                        category:
+                                            type: string
+                                            example: 'SALARY'
+                                        createdAt:
+                                            type: string
+                                            format: date-time
+                                            example: '2025-01-20T10:00:00Z'
+                                        updatedAt:
+                                            type: string
+                                            format: date-time
+                                            example: '2025-01-20T10:00:00Z'
+                                        userId:
+                                            type: string
+                                            example: '28c20116-f286-47ac-a301-16a63d742671'
                 500:
                     description: Server error.
                     content:
@@ -399,23 +412,36 @@ paths:
                             schema:
                                 type: object
                                 properties:
-                                    income:
-                                        type: object
-                                        properties:
-                                            id:
-                                                type: integer
-                                                example: 1
-                                            amount:
-                                                type: number
-                                                format: double
-                                                example: 5000.0
-                                            description:
-                                                type: string
-                                                example: 'Freelance project'
-                                            createdAt:
-                                                type: string
-                                                format: date-time
-                                                example: '2025-01-20T10:00:00Z'
+                                    id:
+                                        type: integer
+                                        example: 1
+                                    amount:
+                                        type: number
+                                        format: double
+                                        example: 5000.0
+                                    description:
+                                        type: string
+                                        example: 'Salary for January'
+                                    frequency:
+                                        type: string
+                                        example: 'MONTHLY'
+                                    date:
+                                        type: date-time
+                                        example: null
+                                    category:
+                                        type: string
+                                        example: 'SALARY'
+                                    createdAt:
+                                        type: string
+                                        format: date-time
+                                        example: '2025-01-20T10:00:00Z'
+                                    updatedAt:
+                                        type: string
+                                        format: date-time
+                                        example: '2025-01-20T10:00:00Z'
+                                    userId:
+                                        type: string
+                                        example: '28c20116-f286-47ac-a301-16a63d742671'
                 500:
                     description: Server error.
                     content:
@@ -561,27 +587,40 @@ paths:
                     content:
                         application/json:
                             schema:
-                                type: object
-                                properties:
-                                    expenses:
-                                        type: array
-                                        items:
-                                            type: object
-                                            properties:
-                                                id:
-                                                    type: integer
-                                                    example: 1
-                                                description:
-                                                    type: string
-                                                    example: 'Grocery shopping'
-                                                amount:
-                                                    type: number
-                                                    format: float
-                                                    example: 100.50
-                                                date:
-                                                    type: string
-                                                    format: date
-                                                    example: '2025-01-21'
+                                type: array
+                                items:
+                                    type: object
+                                    properties:
+                                        id:
+                                            type: integer
+                                            example: 1
+                                        title:
+                                            type: string
+                                            example: 'Grocery shopping'
+                                        description:
+                                            type: string
+                                            example: 'Milk, bread and so on'
+                                        frequency:
+                                            type: string
+                                            example: 'WEEKLY'
+                                        amount:
+                                            type: number
+                                            format: float
+                                            example: 100.50
+                                        category:
+                                            type: string
+                                            example: 'FOOD'
+                                        createdAt:
+                                            type: string
+                                            format: date-time
+                                            example: '2025-01-20T10:00:00Z'
+                                        updatedAt:
+                                            type: string
+                                            format: date-time
+                                            example: '2025-01-20T10:00:00Z'
+                                        userId:
+                                            type: string
+                                            example: '28c20116-f286-47ac-a301-16a63d742671'
                 500:
                     description: Server error.
                     content:
@@ -691,23 +730,36 @@ paths:
                             schema:
                                 type: object
                                 properties:
-                                    expense:
-                                        type: object
-                                        properties:
-                                            id:
-                                                type: integer
-                                                example: 1
-                                            description:
-                                                type: string
-                                                example: 'Electricity bill'
-                                            amount:
-                                                type: number
-                                                format: float
-                                                example: 200.75
-                                            date:
-                                                type: string
-                                                format: date
-                                                example: '2025-01-22'
+                                    id:
+                                        type: integer
+                                        example: 1
+                                    title:
+                                        type: string
+                                        example: 'Grocery shopping'
+                                    description:
+                                        type: string
+                                        example: 'Milk, bread and so on'
+                                    frequency:
+                                        type: string
+                                        example: 'WEEKLY'
+                                    amount:
+                                        type: number
+                                        format: float
+                                        example: 100.50
+                                    category:
+                                        type: string
+                                        example: 'FOOD'
+                                    createdAt:
+                                        type: string
+                                        format: date-time
+                                        example: '2025-01-20T10:00:00Z'
+                                    updatedAt:
+                                        type: string
+                                        format: date-time
+                                        example: '2025-01-20T10:00:00Z'
+                                    userId:
+                                        type: string
+                                        example: '28c20116-f286-47ac-a301-16a63d742671'
                 500:
                     description: Server error.
                     content:
