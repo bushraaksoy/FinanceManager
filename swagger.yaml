@@ -10,12 +10,18 @@ tags:
       description: Endpoints related to user authentication
     - name: User
       description: Endpoints for user management
+    - name: Profile
+      description: Endpoints for user profile management
     - name: Income
       description: Endpoints for managing income
     - name: Expense
       description: Endpoints for managing expenses
     - name: Saving
       description: Endpoints for managing savings
+    - name: Profile
+      description: Endpoints for managing user profile
+    - name: Transaction
+      description: Endpoint for managing user transactions
 paths:
     /auth/login:
         post:
@@ -707,7 +713,6 @@ paths:
                                     error:
                                         type: string
                                         example: 'Error message'
-
     /expenses/{expenseId}:
         get:
             tags:
@@ -1002,7 +1007,6 @@ paths:
                                         type: string
                                     error:
                                         type: string
-
     /savings/{savingId}:
         get:
             tags:
@@ -1169,3 +1173,60 @@ paths:
                                         type: string
                                     error:
                                         type: string
+    /profile:
+        get:
+            tags:
+                - Profile
+            summary: Get profile
+            description: Retrieves the user profile by the user ID.
+            parameters:
+                - name: userId
+                  in: header
+                  required: true
+                  schema:
+                      type: string
+                      example: 28c20116-f286-47ac-a301-16a63d742671
+            responses:
+                200:
+                    description: Profile retrieved successfully.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    fullname:
+                                        type: string
+                                        example: 'Bushra Aksoy'
+                                    username:
+                                        type: string
+                                        example: 'bushraaksoy'
+                                    email:
+                                        type: string
+                                        example: 'bbxsra17@gmail.com'
+                                    dob:
+                                        type: string
+                                        format: date-time
+                                        example: '2003-07-17T13:37:53.403Z'
+                                    gender:
+                                        type: string
+                                        example: 'FEMALE'
+                400:
+                    description: Invalid userId
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'User ID is missing'
+                500:
+                    description: Internal Server Error
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'An error occured'
