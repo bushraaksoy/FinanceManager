@@ -15,7 +15,6 @@ const app = express();
 const PORT = process.env.PORT || 3002;
 const upload = multer({ dest: 'uploads/images' });
 
-// Serve Swagger docs
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.use(

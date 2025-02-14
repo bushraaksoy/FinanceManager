@@ -140,7 +140,6 @@ model Notification {
 model SurveyData {
   user                  User               @relation(fields: [userId], references: [id])
   userId                String             @id
-  age                   Int?
   monthlyIncome         Float?
   financialLiteracy     FinancialLiteracy?
   maxSpending           ExpenseCategory?
