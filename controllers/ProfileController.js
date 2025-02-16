@@ -1,4 +1,5 @@
 import prisma from '../db/db.config.js';
+import { formatDate } from '../utils/formatters.js';
 
 class ProfileController {
     static async getUserProfile(req, res) {
@@ -20,7 +21,9 @@ class ProfileController {
                     gender: true,
                 },
             });
-            return res.status(200).send(profile);
+            return res
+                .status(200)
+                .send({ ...profile, dob: formatDate(profile.dob) });
         } catch (error) {
             console.log('Server Error: ', error);
             return res.status(500).send('An error occurred!');

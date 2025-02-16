@@ -1205,8 +1205,7 @@ paths:
                                         example: 'bbxsra17@gmail.com'
                                     dob:
                                         type: string
-                                        format: date-time
-                                        example: '2003-07-17T13:37:53.403Z'
+                                        example: '7/17/2003'
                                     gender:
                                         type: string
                                         example: 'FEMALE'
