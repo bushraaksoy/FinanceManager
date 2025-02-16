@@ -6,9 +6,11 @@ const analyticsRouter = Router();
 // Analytics
 analyticsRouter.get('/total-income', AnalyticsController.getTotalIncome);
 analyticsRouter.get('/total-expenses', AnalyticsController.getTotalExpenses);
-// analyticsRouter.get(
-//     '/balance-overview',
-//     AnalyticsController.getBalanceOverview
-// );
+analyticsRouter.get('/survey-data', AnalyticsController.getSurveyData);
+analyticsRouter.post('/survey-data', AnalyticsController.addSurveyData);
+analyticsRouter.get(
+    '/balance-overview',
+    AnalyticsController.getBalanceOverview
+);
 
 export default analyticsRouter;

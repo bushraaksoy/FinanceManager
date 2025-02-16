@@ -145,6 +145,7 @@ model SurveyData {
   maxSpending           ExpenseCategory?
   // expenses / subscriptions
   avgMonthlySpending    Float?
+  monthlySaving         Float?
   financialGoalPriority String? // Enum??
   importantAppFeature   String? // Enum??
 }
@@ -156,3 +157,5 @@ enum FinancialLiteracy {
 }
 
 //! SUBSCRIPTIONS!? UPCOMING PAYMENTS!?
+// TODO: work on varrying monthly income
+// How should i implement the concept of subscriptions? 
