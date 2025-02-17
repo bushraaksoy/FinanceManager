@@ -98,16 +98,46 @@ class ExpenseController {
                 where: { userId },
             });
 
+            // transactions to get how much has been spent already:
+            const now = new Date();
+            const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+            const startOfNextMonth = new Date(
+                now.getFullYear(),
+                now.getMonth() + 1,
+                1
+            );
+
+            let totalExpenseSpending = {};
+            const transactions = await prisma.transactionHistory.findMany({
+                where: {
+                    userId,
+                    createdAt: { gte: startOfMonth, lt: startOfNextMonth },
+                },
+                orderBy: { createdAt: 'desc' },
+            });
+
+            transactions.map((transaction) => {
+                if (totalExpenseSpending[transaction.expenseId]) {
+                    totalExpenseSpending[transaction.expenseId] +=
+                        transaction.amount;
+                } else {
+                    totalExpenseSpending[transaction.expenseId] =
+                        transaction.amount;
+                }
+            });
+
             const groupedExpenses = expenses.reduce((acc, expense) => {
                 const categoryName = expense.category || 'OTHER';
 
                 if (!acc[categoryName]) {
                     acc[categoryName] = [];
                 }
-
+                expense.usedAmount = totalExpenseSpending[expense.id] || 0;
                 acc[categoryName].push(expense);
                 return acc;
             }, {});
+
+            console.log('total expense spending: ', totalExpenseSpending);
 
             res.status(200).send(groupedExpenses);
         } catch (error) {
