@@ -245,3 +245,48 @@ this will load all the expenses we have done for this month
     ]
   }
 ```
+
+# Pages
+
+-   Home
+-   Spendings
+-   Budget Planner
+-   Analytics
+-   Profile
+
+## Budget planner page has 3 Main Functionalities
+
+-   Managing Income
+-   Managing Expenses
+-   Managing Savings
+
+### Income Management
+
+-   A user can add a source of income
+-   A user can edit their source of income
+-   A user can delete their source of income
+
+### Expense Management
+
+-   A user can add an expense assigning the limit spending amount on that expense each month
+-   A user can edit a specific expense
+-   A user can delete an expense
+
+### Savings Management
+
+-   A user can add financial goals they want to save for
+-   A user can edit their financial goal
+-   A user can delete a financial goal
+
+## Spendings page has two main functionalities
+
+-   Viewing the amount spent on each expense for this month
+-   Adding new spendings that the user has recently made
+
+### Viewing spendings
+
+-   The user can see how much they spent on specific expenses, as well as how much more they can spend on that expense to not go over budget. They can see a progress bar for better visual understanding.
+
+### Adding new spendings
+
+-   When a user makes a new purchase, they can tap on the specific expense they want to add it in, and insert the amount they have spent on that category.

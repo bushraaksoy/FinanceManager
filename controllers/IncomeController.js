@@ -1,10 +1,21 @@
 import prisma from '../db/db.config.js';
 
 class IncomeController {
+    // TODO: get income status of all incomes and balance left over (you can minus from all transactions made from that incomeId)
+
     static async getAllIncomes(req, res) {
         try {
             const userId = req.headers['user-id'];
-            const incomes = await prisma.income.findMany({ where: { userId } });
+            const incomes = await prisma.income.findMany({
+                where: { userId },
+                select: {
+                    id: true,
+                    title: true,
+                    description: true,
+                    amount: true,
+                    frequency: true,
+                },
+            });
             res.status(200).send(incomes);
         } catch (error) {
             console.error(error);

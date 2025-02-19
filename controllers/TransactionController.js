@@ -1,4 +1,5 @@
 import prisma from '../db/db.config.js';
+import { formatDate, formatTransactionDate } from '../utils/formatters.js';
 
 class TransactionController {
     static async getTransactionHistory(req, res) {
@@ -13,12 +14,29 @@ class TransactionController {
                 1
             );
 
-            const transactions = await prisma.transactionHistory.findMany({
+            let transactions = await prisma.transactionHistory.findMany({
                 where: {
                     userId,
                     createdAt: { gte: startOfMonth, lt: startOfNextMonth },
                 },
+                include: {
+                    expense: {
+                        select: {
+                            title: true,
+                        },
+                    },
+                    income: {
+                        select: {
+                            title: true,
+                        },
+                    },
+                },
                 orderBy: { createdAt: 'desc' },
+            });
+
+            transactions = transactions.map((transaction) => {
+                const date = formatTransactionDate(transaction['createdAt']);
+                return { ...transaction, createdAt: date };
             });
 
             res.status(200).send(transactions);
@@ -62,6 +80,28 @@ class TransactionController {
             return res
                 .status(400)
                 .sent({ message: 'Specify valid type param' });
+        } catch (error) {
+            console.error(error);
+            res.status(500).send({
+                message: 'Server Error',
+                error: error.message,
+            });
+        }
+    }
+
+    static async updateTransaction(req, res) {
+        try {
+            console.log('requesting transaction update');
+            const userId = req.headers['user-id'];
+            const { transactionId } = req.params;
+            const data = req.body;
+            await prisma.transactionHistory.update({
+                where: { id: +transactionId, userId },
+                data,
+            });
+            return res
+                .status(200)
+                .send({ message: 'Transaction updated successfully!' });
         } catch (error) {
             console.error(error);
             res.status(500).send({

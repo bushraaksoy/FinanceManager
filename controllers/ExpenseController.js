@@ -1,6 +1,7 @@
 import prisma from '../db/db.config.js';
 
 class ExpenseController {
+    // TODO: Handle fized expenses like subscriptions and rent and so on
     static async getAllExpenses(req, res) {
         try {
             const userId = req.headers['user-id'];
@@ -136,8 +137,6 @@ class ExpenseController {
                 acc[categoryName].push(expense);
                 return acc;
             }, {});
-
-            console.log('total expense spending: ', totalExpenseSpending);
 
             res.status(200).send(groupedExpenses);
         } catch (error) {
