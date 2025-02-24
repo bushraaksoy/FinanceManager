@@ -39,13 +39,16 @@ class ProfileController {
             }
 
             const data = req.body;
-
-            const newDate = new Date(data.dob);
-            console.log('new date: ', newDate);
+            let updatedData = data;
+            if (data.dob) {
+                const newDate = new Date(data.dob);
+                console.log('new date: ', newDate);
+                updatedData = { ...updatedData, dob: newDate };
+            }
 
             await prisma.user.update({
                 where: { id: userId },
-                data: { ...data, dob: newDate },
+                data: updatedData,
             });
             return res
                 .status(200)
