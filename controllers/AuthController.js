@@ -13,16 +13,16 @@ class AuthController {
             const { username, password } = req.body;
             const user = await prisma.user.findUnique({
                 where: {
-                    username: username,
+                    username,
                 },
             });
             if (!user) {
-                res.status(401).send({
+                return res.status(401).send({
                     message: 'Invalid username or password',
                 });
-                return;
             }
-            const isMatch = bcrypt.compare(password, user.password);
+            const isMatch = await bcrypt.compare(password, user.password);
+            console.log('ismatch: ', isMatch);
             if (isMatch) {
                 const access_token = jwt.sign(
                     { userId: user.id },
@@ -36,16 +36,17 @@ class AuthController {
                     { expiresIn: REFRESH_TOKEN_EXPIRATION }
                 );
 
-                res.status(200).send({
+                console.log(`user ${username} logged in successfully!`);
+                return res.status(200).send({
                     message: 'Logged in successfully',
                     userId: user.id,
                     access_token,
                     refresh_token,
                 });
-                console.log(`user ${username} logged in successfully!`);
-                return;
+            } else {
+                console.log('wrong password');
+                return res.status(401).send({ message: 'Incorrect password' });
             }
-            res.status(401).send({ message: 'Incorrect password' });
         } catch (error) {
             console.log('Server error in login: ', error);
             res.status(500).send({ message: 'Server Error', error: error });
