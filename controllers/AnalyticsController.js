@@ -4,11 +4,12 @@ class AnalyticsController {
     static async getTotalIncome(req, res) {
         try {
             const userId = req.headers['user-id'];
-            const totalIncome = await prisma.income.aggregate({
+            let totalIncome = await prisma.income.aggregate({
                 where: { userId },
                 _sum: { amount: true },
             });
-            res.status(200).send({ totalIncome: totalIncome._sum.amount });
+            totalIncome = totalIncome._sum.amount;
+            res.status(200).send({ totalIncome });
         } catch (error) {
             console.log(`error: ${error.message}`);
             res.status(500).send({ error: 'A server error occured' });
@@ -62,6 +63,7 @@ class AnalyticsController {
 
     static async getBalanceOverview(req, res) {
         try {
+            console.log('attempt to get balance overview');
             const userId = req.headers['user-id'];
             let totalIncome = await prisma.income.aggregate({
                 where: { userId },
@@ -73,8 +75,8 @@ class AnalyticsController {
                 _sum: { amount: true },
             });
 
-            totalIncome = totalIncome._sum.amount;
-            totalExpenses = totalExpenses._sum.amount;
+            totalIncome = totalIncome._sum.amount || 0;
+            totalExpenses = totalExpenses._sum.amount || 0;
 
             const now = new Date();
             const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -91,19 +93,48 @@ class AnalyticsController {
                 },
                 _sum: { amount: true },
             });
-            totalSpending = totalSpending._sum.amount;
+            totalSpending = totalSpending._sum.amount || 0;
 
             const currentBalance = totalIncome - totalSpending;
 
-            return res.status(200).send({
+            const overview = {
                 totalIncome,
                 totalExpenses,
                 totalSpending,
                 currentBalance,
-            });
+            };
+
+            console.log(overview);
+            return res.status(200).send(overview);
         } catch (error) {
             console.log(`error: ${error.message}`);
-            res.status(500).send({ error: 'A server error occured' });
+            return res.status(500).send({ error: 'A server error occured' });
+        }
+    }
+
+    static async getBudgetRemainder(req, res) {
+        try {
+            const userId = req.headers['user-id'];
+            let totalIncome = await prisma.income.aggregate({
+                where: { userId },
+                _sum: { amount: true },
+            });
+
+            let totalExpenses = await prisma.expense.aggregate({
+                where: { userId },
+                _sum: { amount: true },
+            });
+
+            totalIncome = totalIncome._sum.amount || 0;
+            totalExpenses = totalExpenses._sum.amount || 0;
+
+            const budgetRemainder = totalIncome - totalExpenses;
+            console.log(budgetRemainder);
+
+            return res.status(200).send({ budgetRemainder });
+        } catch (error) {
+            console.log(`error: ${error}`);
+            return res.status(500).send({ error: 'A server error occured' });
         }
     }
 

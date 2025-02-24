@@ -12,5 +12,9 @@ analyticsRouter.get(
     '/balance-overview',
     AnalyticsController.getBalanceOverview
 );
+analyticsRouter.get(
+    '/budget-remainder',
+    AnalyticsController.getBudgetRemainder
+);
 
 export default analyticsRouter;

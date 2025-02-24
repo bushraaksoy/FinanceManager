@@ -5,6 +5,7 @@ class IncomeController {
 
     static async getAllIncomes(req, res) {
         try {
+            console.log('getting all incomes');
             const userId = req.headers['user-id'];
             const incomes = await prisma.income.findMany({
                 where: { userId },
@@ -43,11 +44,12 @@ class IncomeController {
     }
     static async addIncome(req, res) {
         try {
+            console.log('attempt to add income');
             const userId = req.headers['user-id'];
             const data = req.body;
             console.log('data ', data);
             const income = await prisma.income.create({
-                data: { ...data, userId },
+                data: { ...data, amount: +data.amount, userId },
             });
             res.status(200).send({
                 message: 'Income added successfully!',

@@ -39,7 +39,14 @@ class ProfileController {
             }
 
             const data = req.body;
-            await prisma.user.update({ where: { id: userId }, data });
+
+            const newDate = new Date(data.dob);
+            console.log('new date: ', newDate);
+
+            await prisma.user.update({
+                where: { id: userId },
+                data: { ...data, dob: newDate },
+            });
             return res
                 .status(200)
                 .send({ message: 'User profile updated successfully!' });

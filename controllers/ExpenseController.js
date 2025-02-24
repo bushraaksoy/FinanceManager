@@ -40,7 +40,7 @@ class ExpenseController {
             const category = data.category ? data.category : 'OTHER';
             console.log('data ', data);
             const expense = await prisma.expense.create({
-                data: { ...data, userId, category },
+                data: { ...data, amount: +data.amount, userId, category },
             });
             res.status(200).send({
                 message: 'Expense added successfully!',

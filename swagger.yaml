@@ -341,7 +341,7 @@ paths:
                   required: true
                   schema:
                       type: string
-                      example: '12345'
+                      example: '28c20116-f286-47ac-a301-16a63d742671'
             requestBody:
                 required: true
                 content:
@@ -586,7 +586,7 @@ paths:
                   description: ID of the user whose expenses are to be retrieved.
                   schema:
                       type: string
-                      example: '12345'
+                      example: '28c20116-f286-47ac-a301-16a63d742671'
             responses:
                 200:
                     description: List of expenses retrieved successfully.
@@ -653,7 +653,7 @@ paths:
                   description: ID of the user adding the expense.
                   schema:
                       type: string
-                      example: '12345'
+                      example: '28c20116-f286-47ac-a301-16a63d742671'
             requestBody:
                 required: true
                 content:
@@ -906,12 +906,35 @@ paths:
                                     error:
                                         type: string
                                         example: 'Error message'
+    /expenses/expense-category:
+        get:
+            tags:
+                - Delete
+            summary: Get expenses with category
+            description: Get all expenses grouped in their categories by user ID.
+            parameters:
+                - name: userId
+                  in: header
+                  required: true
+                  description: ID of the user
+                  schema:
+                      type: String
+                      example: '28c20116-f286-47ac-a301-16a63d742671'
+
     /savings:
         get:
             tags:
                 - Saving
             summary: Get all savings for a user
             description: Returns a list of savings associated with the provided user ID.
+            parameters:
+                - name: userId
+                  in: header
+                  required: true
+                  description: ID of the user
+                  schema:
+                      type: String
+                      example: 1
             responses:
                 '200':
                     description: Successfully retrieved savings
@@ -1365,6 +1388,9 @@ paths:
                             type: object
                             properties:
                                 expenseId:
+                                    type: number
+                                    example: '1'
+                                incomeId:
                                     type: number
                                     example: '1'
                                 amount:
