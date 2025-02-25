@@ -9,5 +9,11 @@ transactionRouter.put(
     '/:transactionId',
     TransactionController.updateTransaction
 );
+transactionRouter.delete(
+    '/:transactionId',
+    TransactionController.deleteTransaction
+);
+transactionRouter.post('/saving', TransactionController.addSavingTransaction);
+transactionRouter.post('/expense', TransactionController.addExpenseTransaction);
 
 export default transactionRouter;

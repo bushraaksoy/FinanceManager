@@ -51,9 +51,11 @@ class TransactionController {
 
     static async addTransaction(req, res) {
         try {
+            console.log('adding transaction');
             const userId = req.headers['user-id'];
             const type = req.query['type'];
             const data = req.body;
+            console.log(req.body);
             if (type == 'EXPENSE') {
                 const expenseTransaction =
                     await prisma.transactionHistory.create({
@@ -77,11 +79,57 @@ class TransactionController {
                     savingTransaction,
                 });
             }
+
             return res
                 .status(400)
-                .sent({ message: 'Specify valid type param' });
+                .send({ message: 'Specify valid type param' });
         } catch (error) {
             console.error(error);
+            res.status(500).send({
+                message: 'Server Error',
+                error: error.message,
+            });
+        }
+    }
+
+    static async addExpenseTransaction(req, res) {
+        try {
+            const userId = req.headers['user-id'];
+            let data = req.body;
+            data = { ...data, userId, type: 'EXPENSE' };
+            console.log('adding transaction: ', data);
+            const expenseTransaction = await prisma.transactionHistory.create({
+                data,
+            });
+            return res.status(200).send({
+                message: 'Expense transaction added successfully!',
+                expenseTransaction,
+            });
+        } catch (error) {
+            res.status(500).send({
+                message: 'Server Error',
+                error: error.message,
+            });
+        }
+    }
+
+    static async addSavingTransaction(req, res) {
+        try {
+            const userId = req.headers['user-id'];
+            let data = req.body;
+            data = { ...data, userId, type: 'SAVING' };
+            const savingTransaction = await prisma.transactionHistory.create({
+                data,
+            });
+            await prisma.saving.update({
+                where: { id: data.savingId },
+                data: { savedAmount: { increment: data.amount } },
+            });
+            return res.status(200).send({
+                message: 'Saving transaction added successfully',
+                savingTransaction,
+            });
+        } catch (error) {
             res.status(500).send({
                 message: 'Server Error',
                 error: error.message,
@@ -102,6 +150,26 @@ class TransactionController {
             return res
                 .status(200)
                 .send({ message: 'Transaction updated successfully!' });
+        } catch (error) {
+            console.error(error);
+            res.status(500).send({
+                message: 'Server Error',
+                error: error.message,
+            });
+        }
+    }
+    static async deleteTransaction(req, res) {
+        try {
+            console.log('requesting transaction update');
+            // const userId = req.headers['user-id'];
+            const { transactionId } = req.params;
+            const data = req.body;
+            await prisma.transactionHistory.delete({
+                where: { id: +transactionId },
+            });
+            return res
+                .status(200)
+                .send({ message: 'Transaction deleted successfully!' });
         } catch (error) {
             console.error(error);
             res.status(500).send({
