@@ -96,7 +96,15 @@ class TransactionController {
         try {
             const userId = req.headers['user-id'];
             let data = req.body;
-            data = { ...data, userId, type: 'EXPENSE' };
+            console.log(data);
+            data = {
+                ...data,
+                expenseId: +data.expenseId,
+                incomeId: +data.incomeId,
+                amount: +data.amount,
+                userId,
+                type: 'EXPENSE',
+            };
             console.log('adding transaction: ', data);
             const expenseTransaction = await prisma.transactionHistory.create({
                 data,
