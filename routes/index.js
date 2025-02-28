@@ -8,6 +8,7 @@ import expenseRouter from './ExpenseRouter.js';
 import savingsRouter from './SavingRouter.js';
 import transactionRouter from './TransactionRouter.js';
 import analyticsRouter from './AnalyticsRouter.js';
+import cardRouter from './CardRouter.js';
 
 const router = Router();
 
@@ -24,5 +25,6 @@ router.use('', expenseRouter);
 router.use('/savings', savingsRouter);
 router.use('/transactions', transactionRouter);
 router.use('/analytics', analyticsRouter);
+router.use('/cards', cardRouter);
 
 export default router;

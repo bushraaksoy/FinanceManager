@@ -2,6 +2,7 @@ import prisma from '../db/db.config.js';
 import { formatDate, formatTransactionDate } from '../utils/formatters.js';
 
 class TransactionController {
+    //! TODO: update the balance of a card if cardId is available in the transaction.
     static async getTransactionHistory(req, res) {
         // order by date decending
         try {
@@ -20,12 +21,12 @@ class TransactionController {
                     createdAt: { gte: startOfMonth, lt: startOfNextMonth },
                 },
                 include: {
-                    expense: {
+                    card: {
                         select: {
                             title: true,
                         },
                     },
-                    income: {
+                    expense: {
                         select: {
                             title: true,
                         },
@@ -97,14 +98,24 @@ class TransactionController {
             const userId = req.headers['user-id'];
             let data = req.body;
             console.log(data);
-            data = {
-                ...data,
-                expenseId: +data.expenseId,
-                incomeId: +data.incomeId,
-                amount: +data.amount,
-                userId,
-                type: 'EXPENSE',
-            };
+
+            data = data.cardId
+                ? {
+                      ...data,
+                      expenseId: +data.expenseId,
+                      cardId: +data.cardId,
+                      amount: +data.amount,
+                      userId,
+                      type: 'EXPENSE',
+                  }
+                : {
+                      ...data,
+                      expenseId: +data.expenseId,
+                      amount: +data.amount,
+                      userId,
+                      type: 'EXPENSE',
+                  };
+
             console.log('adding transaction: ', data);
             const expenseTransaction = await prisma.transactionHistory.create({
                 data,

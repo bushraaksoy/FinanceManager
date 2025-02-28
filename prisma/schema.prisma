@@ -61,6 +61,7 @@ model User {
   notifications      Notification[]
   SurveyData         SurveyData[]
   TransactionHistory TransactionHistory[]
+  Card               Card[]
 }
 
 model Income {
@@ -71,11 +72,13 @@ model Income {
   frequency          Frequency?
   date               DateTime?
   category           IncomeCategory?
-  createdAt          DateTime             @default(now())
-  updatedAt          DateTime             @updatedAt
   user               User                 @relation(fields: [userId], references: [id])
   userId             String
   TransactionHistory TransactionHistory[]
+  cardId             Int?
+  card               Card?                @relation(fields: [cardId], references: [id])
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
 }
 
 model Expense {
@@ -108,6 +111,17 @@ model Saving {
   TransactionHistory TransactionHistory[]
 }
 
+model Card {
+  id                 Int                  @id @default(autoincrement())
+  title              String
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+  Income             Income[]
+  userId             String
+  user               User                 @relation(fields: [userId], references: [id])
+  TransactionHistory TransactionHistory[]
+}
+
 enum TransactionType {
   SAVING
   EXPENSE
@@ -125,8 +139,10 @@ model TransactionHistory {
   saving    Saving?         @relation(fields: [savingId], references: [id])
   userId    String
   user      User            @relation(fields: [userId], references: [id])
-  incomeId  Int
-  income    Income          @relation(fields: [incomeId], references: [id])
+  incomeId  Int?
+  income    Income?         @relation(fields: [incomeId], references: [id])
+  cardId    Int?
+  card      Card?           @relation(fields: [cardId], references: [id])
   // TODO: Do we add a title to our transaction??? the bank statemnet and so on
 }
 

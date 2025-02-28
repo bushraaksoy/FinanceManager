@@ -1,6 +1,7 @@
 import prisma from '../db/db.config.js';
 
 class AnalyticsController {
+    //! TODO: write another calculation to take leftover balance from all cards?
     static async getTotalIncome(req, res) {
         try {
             const userId = req.headers['user-id'];
