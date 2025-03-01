@@ -53,23 +53,21 @@ class IncomeController {
             // TODO handle cardId
             console.log('attempt to add income');
             const userId = req.headers['user-id'];
-            const data = req.body;
+            let data = req.body;
             console.log('data ', data);
 
             if (data.cardId) {
-                const income = await prisma.income.create({
-                    data: {
-                        ...data,
-                        amount: +data.amount,
-                        cardId: +data.cardId,
-                        userId,
-                    },
-                });
+                data = {
+                    ...data,
+                    amount: +data.amount,
+                    cardId: +data.cardId,
+                    userId,
+                };
             } else {
-                const income = await prisma.income.create({
-                    data: { ...data, amount: +data.amount, userId },
-                });
+                data = { ...data, amount: +data.amount, userId };
             }
+
+            const income = await prisma.income.create({ income });
 
             res.status(200).send({
                 message: 'Income added successfully!',
