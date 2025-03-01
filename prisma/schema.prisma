@@ -175,7 +175,3 @@ enum FinancialLiteracy {
   INTERMEDIATE
   ADVANCED
 }
-
-//! SUBSCRIPTIONS!? UPCOMING PAYMENTS!?
-// TODO: work on varrying monthly income
-// How should i implement the concept of subscriptions? 

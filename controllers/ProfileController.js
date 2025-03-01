@@ -41,6 +41,7 @@ class ProfileController {
             const data = req.body;
             let updatedData = data;
             if (data?.dob) {
+                console.log(data.dob);
                 const newDate = new Date(data.dob);
                 console.log('new date: ', newDate);
                 updatedData = { ...updatedData, dob: newDate };

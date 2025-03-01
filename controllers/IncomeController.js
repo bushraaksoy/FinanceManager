@@ -16,6 +16,11 @@ class IncomeController {
                     description: true,
                     amount: true,
                     frequency: true,
+                    cardId: true,
+                    category: true,
+                },
+                orderBy: {
+                    createdAt: 'asc',
                 },
             });
             res.status(200).send(incomes);
@@ -60,11 +65,6 @@ class IncomeController {
                         userId,
                     },
                 });
-
-                await prisma.card.update({
-                    where: { id: +data.cardId },
-                    data: { currentBalance: { increment: +income.amount } },
-                });
             } else {
                 const income = await prisma.income.create({
                     data: { ...data, amount: +data.amount, userId },
@@ -88,19 +88,16 @@ class IncomeController {
             //TODO Handle cardId
             console.log('attempt to update income');
             const { incomeId } = req.params;
-            const data = req.body;
+            let data = req.body;
+
+            if (data.cardId) {
+                data = { ...data, cardId: +data.cardId };
+            }
 
             const income = await prisma.income.update({
                 where: { id: +incomeId },
                 data,
             });
-
-            if (data?.cardId) {
-                await prisma.card.update({
-                    where: { id: +data.cardId },
-                    data: { currentBalance: { increment: +income.amount } },
-                });
-            }
 
             res.status(200).send({
                 message: 'Income updated successfully!',
