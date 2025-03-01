@@ -67,7 +67,7 @@ class IncomeController {
                 data = { ...data, amount: +data.amount, userId };
             }
 
-            const income = await prisma.income.create({ income });
+            const income = await prisma.income.create({ data });
 
             res.status(200).send({
                 message: 'Income added successfully!',
