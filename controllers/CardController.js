@@ -47,7 +47,7 @@ class CardController {
             const cardId = req.params['cardId'];
             const data = req.body;
             const card = await prisma.card.update({
-                where: { id: cardId },
+                where: { id: +cardId },
                 data,
             });
             return res
