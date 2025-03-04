@@ -8,6 +8,6 @@ savingRouter.get('/', SavingController.getAllSavings);
 savingRouter.post('/', SavingController.addSaving);
 savingRouter.get('/:savingId', SavingController.getSaving);
 savingRouter.put('/:savingId', SavingController.updateSaving);
-savingRouter.delete('/:savingsId', SavingController.deleteSaving);
+savingRouter.delete('/:savingId', SavingController.deleteSaving);
 
 export default savingRouter;
