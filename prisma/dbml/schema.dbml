@@ -1,0 +1,195 @@
+//// ------------------------------------------------------
+//// THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+//// ------------------------------------------------------
+
+Table User {
+  id String [pk]
+  username String [unique, not null]
+  email String [unique]
+  fullname String
+  password String [not null]
+  avatar String
+  dob DateTime
+  gender String
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  incomes Income [not null]
+  expenses Expense [not null]
+  savings Saving [not null]
+  notifications Notification [not null]
+  SurveyData SurveyData [not null]
+  TransactionHistory TransactionHistory [not null]
+  Card Card [not null]
+}
+
+Table Income {
+  id Int [pk, increment]
+  title String [not null]
+  description String
+  amount Float [not null]
+  frequency Frequency
+  date DateTime
+  category IncomeCategory
+  user User [not null]
+  userId String [not null]
+  TransactionHistory TransactionHistory [not null]
+  cardId Int
+  card Card
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table Expense {
+  id Int [pk, increment]
+  title String [not null]
+  description String
+  amount Float [not null]
+  frequency Frequency
+  date DateTime
+  category ExpenseCategory
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  user User [not null]
+  userId String [not null]
+  TransactionHistory TransactionHistory [not null]
+}
+
+Table Saving {
+  id Int [pk, increment]
+  title String [not null]
+  description String
+  targetAmount Float [not null]
+  savedAmount Float
+  monthlySaving Float
+  dueDate DateTime
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  user User [not null]
+  userId String [not null]
+  TransactionHistory TransactionHistory [not null]
+}
+
+Table Card {
+  id Int [pk, increment]
+  title String [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  Income Income [not null]
+  userId String [not null]
+  user User [not null]
+  TransactionHistory TransactionHistory [not null]
+}
+
+Table TransactionHistory {
+  id Int [pk, increment]
+  amount Float [not null]
+  type TransactionType [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  expenseId Int
+  expense Expense
+  savingId Int
+  saving Saving
+  userId String [not null]
+  user User [not null]
+  incomeId Int
+  income Income
+  cardId Int
+  card Card
+}
+
+Table Notification {
+  id Int [pk, increment]
+  title String [not null]
+  message String [not null]
+  time DateTime [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  isRead Boolean [not null]
+  user User [not null]
+  userId String [not null]
+}
+
+Table SurveyData {
+  user User [not null]
+  userId String [pk]
+  monthlyIncome Float
+  financialLiteracy FinancialLiteracy
+  maxSpending ExpenseCategory
+  avgMonthlySpending Float
+  monthlySaving Float
+  financialGoalPriority String
+  importantAppFeature String
+}
+
+Enum Frequency {
+  DAILY
+  WEEKLY
+  MONTHLY
+  YEARLY
+  OTHER
+}
+
+Enum IncomeCategory {
+  SALARY
+  ALLOWANCE
+  COMMISSION
+  INVESTMENT
+  INTEREST
+  ROYALTY
+  FREELANCE
+  OTHER
+}
+
+Enum ExpenseCategory {
+  HOUSING
+  TRANSPORT
+  HEALTH
+  GROCERIES
+  FOOD
+  SHOPPING
+  INSURANCE
+  ENTERTAINMENT
+  SUBSCRIPTION
+  OTHER
+}
+
+Enum NotificationType {
+  REMINDER
+  ALERT
+}
+
+Enum TransactionType {
+  SAVING
+  EXPENSE
+}
+
+Enum FinancialLiteracy {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+Ref: Income.userId > User.id
+
+Ref: Income.cardId > Card.id
+
+Ref: Expense.userId > User.id
+
+Ref: Saving.userId > User.id
+
+Ref: Card.userId > User.id
+
+Ref: TransactionHistory.expenseId > Expense.id
+
+Ref: TransactionHistory.savingId > Saving.id
+
+Ref: TransactionHistory.userId > User.id
+
+Ref: TransactionHistory.incomeId > Income.id
+
+Ref: TransactionHistory.cardId > Card.id
+
+Ref: Notification.userId > User.id
+
+Ref: SurveyData.userId > User.id
