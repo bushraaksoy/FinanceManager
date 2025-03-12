@@ -5,9 +5,44 @@ class ExpenseController {
     static async getAllExpenses(req, res) {
         try {
             const userId = req.headers['user-id'];
-            const expenses = await prisma.expense.findMany({
+            let expenses = await prisma.expense.findMany({
                 where: { userId },
             });
+
+            // transactions to get how much has been spent already:
+            const now = new Date();
+            const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+            const startOfNextMonth = new Date(
+                now.getFullYear(),
+                now.getMonth() + 1,
+                1
+            );
+
+            let totalExpenseSpending = {};
+            const transactions = await prisma.transactionHistory.findMany({
+                where: {
+                    userId,
+                    createdAt: { gte: startOfMonth, lt: startOfNextMonth },
+                },
+                orderBy: { createdAt: 'desc' },
+            });
+
+            transactions.map((transaction) => {
+                if (totalExpenseSpending[transaction.expenseId]) {
+                    totalExpenseSpending[transaction.expenseId] +=
+                        transaction.amount;
+                } else {
+                    totalExpenseSpending[transaction.expenseId] =
+                        transaction.amount;
+                }
+            });
+
+            expenses.map((expense) => {
+                expense.usedAmount = totalExpenseSpending[expense.id] || 0;
+            });
+
+            console.log(totalExpenseSpending);
+            console.log(expenses);
             res.status(200).send(expenses);
         } catch (error) {
             console.error(error);
@@ -92,6 +127,7 @@ class ExpenseController {
             });
         }
     }
+
     static async getExpenseCategories(req, res) {
         try {
             const userId = req.headers['user-id'];

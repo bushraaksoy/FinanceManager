@@ -3,6 +3,7 @@ import { formatDate, formatTransactionDate } from '../utils/formatters.js';
 
 class TransactionController {
     //! TODO: update the balance of a card if cardId is available in the transaction.
+    //! TODO: handle transactions when expenses are deleted, or when cards are deleted.
     static async getTransactionHistory(req, res) {
         // order by date decending
         try {

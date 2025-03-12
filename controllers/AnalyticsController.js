@@ -2,6 +2,7 @@ import prisma from '../db/db.config.js';
 
 class AnalyticsController {
     //! TODO: write another calculation to take leftover balance from all cards?
+
     static async getTotalIncome(req, res) {
         try {
             const userId = req.headers['user-id'];
@@ -32,10 +33,10 @@ class AnalyticsController {
     }
 
     static async addSurveyData(req, res) {
+        // TODO: handle body.monthlyIncome separately. create a new income for that instead, and add rest to surveyData
         try {
             const userId = req.headers['user-id'];
             const data = req.body;
-            // TODO: handle body.monthlyIncome separately. create a new income for that instead, and add rest to surveyData
             await prisma.surveyData.create({
                 data: { ...data, userId },
             });
@@ -65,6 +66,7 @@ class AnalyticsController {
     static async getBalanceOverview(req, res) {
         try {
             console.log('attempt to get balance overview');
+
             const userId = req.headers['user-id'];
             let totalIncome = await prisma.income.aggregate({
                 where: { userId },

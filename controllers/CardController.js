@@ -71,6 +71,7 @@ class CardController {
             return res.status(500).send({ message: error.message });
         }
     }
+
     static async getCardsDetails(req, res) {
         try {
             const userId = req.headers['user-id'];

@@ -85,6 +85,17 @@ model Income {
   updatedAt          DateTime             @updatedAt
 }
 
+model Card {
+  id                 Int                  @id @default(autoincrement())
+  title              String
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+  Income             Income[]
+  userId             String
+  user               User                 @relation(fields: [userId], references: [id])
+  TransactionHistory TransactionHistory[]
+}
+
 model Expense {
   id                 Int                  @id @default(autoincrement())
   title              String
@@ -115,17 +126,6 @@ model Saving {
   TransactionHistory TransactionHistory[]
 }
 
-model Card {
-  id                 Int                  @id @default(autoincrement())
-  title              String
-  createdAt          DateTime             @default(now())
-  updatedAt          DateTime             @updatedAt
-  Income             Income[]
-  userId             String
-  user               User                 @relation(fields: [userId], references: [id])
-  TransactionHistory TransactionHistory[]
-}
-
 enum TransactionType {
   SAVING
   EXPENSE
@@ -145,8 +145,10 @@ model TransactionHistory {
   user      User            @relation(fields: [userId], references: [id])
   incomeId  Int?
   income    Income?         @relation(fields: [incomeId], references: [id])
-  cardId    Int?
-  card      Card?           @relation(fields: [cardId], references: [id])
+
+  cardId Int?
+  card   Card? @relation(fields: [cardId], references: [id])
+
   // TODO: Do we add a title to our transaction??? the bank statemnet and so on
 }
 

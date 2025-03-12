@@ -290,3 +290,24 @@ this will load all the expenses we have done for this month
 ### Adding new spendings
 
 -   When a user makes a new purchase, they can tap on the specific expense they want to add it in, and insert the amount they have spent on that category.
+
+# Card
+
+-   title
+-   incomes[]
+-   userId
+-   transactions[]
+
+# Income
+
+-   title
+-   amount
+-   cardId
+-   userId
+
+# Transactions
+
+-   amount
+-   cardId?
+-   type (EXPENSE or SAVING)
+-   savingId or expenseId
