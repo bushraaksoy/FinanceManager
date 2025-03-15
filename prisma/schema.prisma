@@ -133,6 +133,7 @@ enum TransactionType {
 
 model TransactionHistory {
   id        Int             @id @default(autoincrement())
+  title     String?
   amount    Float
   type      TransactionType
   createdAt DateTime        @default(now())

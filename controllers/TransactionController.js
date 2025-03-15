@@ -126,6 +126,7 @@ class TransactionController {
                 expenseTransaction,
             });
         } catch (error) {
+            console.log(error);
             res.status(500).send({
                 message: 'Server Error',
                 error: error.message,
