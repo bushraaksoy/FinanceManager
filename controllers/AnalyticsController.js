@@ -1,4 +1,5 @@
 import prisma from '../db/db.config.js';
+import { formatTransactionDate } from '../utils/formatters.js';
 
 class AnalyticsController {
     //! TODO: write another calculation to take leftover balance from all cards?
@@ -135,6 +136,29 @@ class AnalyticsController {
             console.log(budgetRemainder);
 
             return res.status(200).send({ budgetRemainder });
+        } catch (error) {
+            console.log(`error: ${error}`);
+            return res.status(500).send({ error: 'A server error occured' });
+        }
+    }
+
+    static async getTransactionSummary(req, res) {
+        try {
+            const userId = req.headers['user-id'];
+            let transactionSummary = await prisma.$queryRaw`
+            SELECT DATE("createdAt") AS date, SUM("amount") AS amount
+                FROM "TransactionHistory"
+                WHERE "userId" = ${userId}
+                GROUP BY DATE("createdAt")
+                ORDER BY date ASC;
+            `;
+
+            transactionSummary = transactionSummary.map((transaction) => {
+                const date = formatTransactionDate(transaction['date']);
+                return { ...transaction, date };
+            });
+
+            return res.status(200).send(transactionSummary);
         } catch (error) {
             console.log(`error: ${error}`);
             return res.status(500).send({ error: 'A server error occured' });
