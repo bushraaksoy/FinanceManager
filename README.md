@@ -311,3 +311,10 @@ this will load all the expenses we have done for this month
 -   cardId?
 -   type (EXPENSE or SAVING)
 -   savingId or expenseId
+
+# Triggers
+
+-   when an expense is deleted ( handle transactions )
+-   when an income is deleted? (handle cards? )
+-   when you add an income to a card
+-
