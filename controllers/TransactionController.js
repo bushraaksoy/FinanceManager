@@ -51,49 +51,6 @@ class TransactionController {
         }
     }
 
-    static async addTransaction(req, res) {
-        try {
-            console.log('adding transaction');
-            const userId = req.headers['user-id'];
-            const type = req.query['type'];
-            const data = req.body;
-            console.log(req.body);
-            if (type == 'EXPENSE') {
-                const expenseTransaction =
-                    await prisma.transactionHistory.create({
-                        data: { ...data, userId, type },
-                    });
-                console.log(expenseTransaction);
-                return res.status(200).send({
-                    message: 'Expense transaction added successfully!',
-                });
-            } else if (type == 'SAVING') {
-                const savingTransaction =
-                    await prisma.transactionHistory.create({
-                        data: { ...data, userId, type: 'SAVING' },
-                    });
-                await prisma.saving.update({
-                    where: { id: data.savingId },
-                    data: { savedAmount: { increment: data.amount } },
-                });
-                return res.status(200).send({
-                    message: 'Saving transaction added successfully!',
-                    savingTransaction,
-                });
-            }
-
-            return res
-                .status(400)
-                .send({ message: 'Specify valid type param' });
-        } catch (error) {
-            console.error(error);
-            res.status(500).send({
-                message: 'Server Error',
-                error: error.message,
-            });
-        }
-    }
-
     static async addExpenseTransaction(req, res) {
         try {
             const userId = req.headers['user-id'];
