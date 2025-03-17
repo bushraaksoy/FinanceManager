@@ -41,6 +41,8 @@ class TransactionController {
                 return { ...transaction, createdAt: date };
             });
 
+            console.log(transactions);
+
             res.status(200).send(transactions);
         } catch (error) {
             console.error(error);
