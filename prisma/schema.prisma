@@ -130,6 +130,7 @@ model Saving {
 enum TransactionType {
   SAVING
   EXPENSE
+  INCOME
 }
 
 model TransactionHistory {

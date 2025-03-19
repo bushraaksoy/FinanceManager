@@ -6,6 +6,7 @@ const incomeRouter = Router();
 // Income
 incomeRouter.get('/', IncomeController.getAllIncomes);
 incomeRouter.post('/', IncomeController.addIncome);
+incomeRouter.get('/pending', IncomeController.getPendingIncomes);
 incomeRouter.get('/:incomeId', IncomeController.getIncome);
 incomeRouter.put('/:incomeId', IncomeController.updateIncome);
 incomeRouter.delete('/:incomeId', IncomeController.deleteIncome);

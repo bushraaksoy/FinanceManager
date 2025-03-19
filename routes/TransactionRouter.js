@@ -14,5 +14,6 @@ transactionRouter.delete(
 );
 transactionRouter.post('/saving', TransactionController.addSavingTransaction);
 transactionRouter.post('/expense', TransactionController.addExpenseTransaction);
+transactionRouter.post('/income', TransactionController.addIncomeTransaction);
 
 export default transactionRouter;

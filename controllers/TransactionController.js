@@ -19,6 +19,7 @@ class TransactionController {
             let transactions = await prisma.transactionHistory.findMany({
                 where: {
                     userId,
+                    // type: 'EXPENSE',
                     createdAt: { gte: startOfMonth, lt: startOfNextMonth },
                 },
                 include: {
@@ -32,6 +33,11 @@ class TransactionController {
                             title: true,
                         },
                     },
+                    income: {
+                        select: {
+                            title: true,
+                        },
+                    },
                 },
                 orderBy: { createdAt: 'desc' },
             });
@@ -40,8 +46,6 @@ class TransactionController {
                 const date = formatTransactionDate(transaction['createdAt']);
                 return { ...transaction, createdAt: date };
             });
-
-            console.log(transactions);
 
             res.status(200).send(transactions);
         } catch (error) {
@@ -97,7 +101,22 @@ class TransactionController {
         try {
             const userId = req.headers['user-id'];
             let data = req.body;
-            data = { ...data, userId, type: 'SAVING' };
+            data = data.cardId
+                ? {
+                      ...data,
+                      savingId: +data.savingId,
+                      cardId: +data.cardId,
+                      amount: +data.amount,
+                      userId,
+                      type: 'SAVING',
+                  }
+                : {
+                      ...data,
+                      savingId: +data.savingId,
+                      amount: +data.amount,
+                      userId,
+                      type: 'SAVING',
+                  };
             const savingTransaction = await prisma.transactionHistory.create({
                 data,
             });
@@ -110,6 +129,52 @@ class TransactionController {
                 savingTransaction,
             });
         } catch (error) {
+            res.status(500).send({
+                message: 'Server Error',
+                error: error.message,
+            });
+        }
+    }
+
+    static async addIncomeTransaction(req, res) {
+        try {
+            //! should the user have to enter the amount also or just the incomeId is sufficient?
+            const userId = req.headers['user-id'];
+            let data = req.body;
+            data = data.cardId
+                ? {
+                      ...data,
+                      incomeId: +data.incomeId,
+                      cardId: +data.cardId,
+                      amount: +data.amount,
+                      userId,
+                      type: 'INCOME',
+                  }
+                : {
+                      ...data,
+                      incomeId: +data.incomeId,
+                      amount: +data.amount,
+                      userId,
+                      type: 'INCOME',
+                  };
+            // add income transaction to transactionHistory
+            const incomeTransaction = await prisma.transactionHistory.create({
+                data,
+            });
+            // update the card
+            if (data.cardId) {
+                await prisma.card.update({
+                    where: { id: data.cardId },
+                    data: { balance: { increment: data.amount } },
+                });
+            }
+
+            return res.status(200).send({
+                message: 'Income transaction added successfully',
+                incomeTransaction,
+            });
+        } catch (error) {
+            console.log(error);
             res.status(500).send({
                 message: 'Server Error',
                 error: error.message,
@@ -140,13 +205,19 @@ class TransactionController {
     }
     static async deleteTransaction(req, res) {
         try {
-            console.log('requesting transaction update');
+            console.log('requesting transaction delete');
             // const userId = req.headers['user-id'];
             const { transactionId } = req.params;
             const data = req.body;
-            await prisma.transactionHistory.delete({
+            const transaction = await prisma.transactionHistory.delete({
                 where: { id: +transactionId },
             });
+
+            await prisma.card.update({
+                where: { id: transaction.cardId },
+                data: { balance: { increment: -transaction.amount } },
+            });
+
             return res
                 .status(200)
                 .send({ message: 'Transaction deleted successfully!' });

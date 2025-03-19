@@ -291,30 +291,32 @@ this will load all the expenses we have done for this month
 
 -   When a user makes a new purchase, they can tap on the specific expense they want to add it in, and insert the amount they have spent on that category.
 
-# Card
-
--   title
--   incomes[]
--   userId
--   transactions[]
-
-# Income
-
--   title
--   amount
--   cardId
--   userId
-
-# Transactions
-
--   amount
--   cardId?
--   type (EXPENSE or SAVING)
--   savingId or expenseId
-
 # Triggers
 
 -   when an expense is deleted ( handle transactions )
 -   when an income is deleted? (handle cards? )
 -   when you add an income to a card
--
+
+you have a card, you need to be able to "topup" your card
+we need to somehow trigger the income being added to the card.
+
+if the income has not been added to the card then we will always see it displayed there, once we add it then it dissapears
+the incomes show up reqularly based on frequency, then user can click "topup" or add so it goes into the card.
+
+how to display non topped up amounts??
+maybe we have an endpoint to get all income transactions?
+/transactions/income
+
+then we also have
+
+/transactions/income?frequency=monthly
+
+for this we render all of them which have a "createdAt" or "date" that are > 30 days? or that are in the previous month (month-1 % 12)?
+
+/transactions/income?frequency=weekly
+
+for this we render all of them which have a "createdAt" or "date" that are > 7 days?
+
+sounds good.
+
+maybe i have an endpoint like /incomes/pendingIncomes ?? or

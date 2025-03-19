@@ -146,12 +146,31 @@ class AnalyticsController {
         try {
             const userId = req.headers['user-id'];
             let transactionSummary = await prisma.$queryRaw`
-            SELECT DATE("createdAt") AS date, SUM("amount") AS amount
-                FROM "TransactionHistory"
-                WHERE "userId" = ${userId}
-                GROUP BY DATE("createdAt")
-                ORDER BY date ASC;
+            WITH date_series AS (
+            SELECT GENERATE_SERIES(
+                DATE_TRUNC('month', CURRENT_DATE), 
+                DATE_TRUNC('month', CURRENT_DATE) + INTERVAL '1 month' - INTERVAL '1 day',
+                INTERVAL '1 day'
+            ) AS date
+            )
+            SELECT 
+                date_series.date AS date,
+                COALESCE(SUM("amount"), 0) AS amount
+            FROM date_series
+            LEFT JOIN "TransactionHistory"
+                ON DATE("createdAt") = date_series.date AND "userId" = ${userId} AND "type" = 'EXPENSE'
+            GROUP BY date_series.date
+            ORDER BY date_series.date ASC;
+
             `;
+
+            // `
+            // SELECT DATE("createdAt") AS date, SUM("amount") AS amount
+            //     FROM "TransactionHistory"
+            //     WHERE "userId" = ${userId} AND "type" = 'EXPENSE'
+            //     GROUP BY DATE("createdAt")
+            //     ORDER BY date ASC;
+            // `;
 
             transactionSummary = transactionSummary.map((transaction) => {
                 const date = formatTransactionDate(transaction['date']);

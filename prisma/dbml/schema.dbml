@@ -164,6 +164,7 @@ Enum NotificationType {
 Enum TransactionType {
   SAVING
   EXPENSE
+  INCOME
 }
 
 Enum FinancialLiteracy {
