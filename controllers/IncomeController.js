@@ -160,7 +160,6 @@ class IncomeController {
             incomeTransactions.forEach((transaction) => {
                 transactionMap.set(transaction.incomeId, transaction.createdAt);
             });
-            console.log('transactionMap', transactionMap);
 
             // Fetch all incomes in one go
             const incomes = await prisma.income.findMany({
@@ -202,7 +201,6 @@ class IncomeController {
                     }
                 }
             });
-            console.log('pendingIncomes', pendingIncomes);
             res.status(200).send(pendingIncomes);
         } catch (error) {
             console.error(error);

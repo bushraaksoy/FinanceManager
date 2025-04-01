@@ -4,6 +4,22 @@ import { formatDate, formatTransactionDate } from '../utils/formatters.js';
 class TransactionController {
     //! TODO: update the balance of a card if cardId is available in the transaction.
     //! TODO: handle transactions when expenses are deleted, or when cards are deleted.
+    static async getAllTransactions(req, res) {
+        try {
+            const userId = req.headers['user-id'];
+            const transactions = await prisma.transactionHistory.findMany({
+                where: { userId },
+            });
+            res.status(200).send(transactions);
+        } catch (error) {
+            console.error(error);
+            res.status(500).send({
+                message: 'Server Error',
+                error: error.message,
+            });
+        }
+    }
+
     static async getTransactionHistory(req, res) {
         // order by date decending
         try {
@@ -79,6 +95,13 @@ class TransactionController {
                       userId,
                       type: 'EXPENSE',
                   };
+
+            if (data.cardId) {
+                await prisma.card.update({
+                    where: { id: +data.cardId },
+                    data: { balance: { increment: -data.amount } },
+                });
+            }
 
             console.log('adding transaction: ', data);
             const expenseTransaction = await prisma.transactionHistory.create({

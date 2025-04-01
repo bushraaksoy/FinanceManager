@@ -4,6 +4,7 @@ import { TransactionController } from '../controllers/index.js';
 const transactionRouter = Router();
 
 transactionRouter.get('', TransactionController.getTransactionHistory);
+transactionRouter.get('/all', TransactionController.getAllTransactions);
 transactionRouter.put(
     '/:transactionId',
     TransactionController.updateTransaction
