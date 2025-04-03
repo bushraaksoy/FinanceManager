@@ -5,7 +5,10 @@ class CardController {
         try {
             console.log('getAllCards attempt');
             const userId = req.headers['user-id'];
-            const cards = await prisma.card.findMany({ where: { userId } });
+            const cards = await prisma.card.findMany({
+                where: { userId },
+                orderBy: { createdAt: 'asc' },
+            });
             return res.status(200).send(cards);
         } catch (error) {
             console.log('server error: ', error);
