@@ -9,6 +9,24 @@ class TransactionController {
             const userId = req.headers['user-id'];
             const transactions = await prisma.transactionHistory.findMany({
                 where: { userId },
+                include: {
+                    card: {
+                        select: {
+                            title: true,
+                        },
+                    },
+                    expense: {
+                        select: {
+                            title: true,
+                        },
+                    },
+                    income: {
+                        select: {
+                            title: true,
+                        },
+                    },
+                },
+                orderBy: { createdAt: 'desc' },
             });
             res.status(200).send(transactions);
         } catch (error) {
@@ -74,34 +92,46 @@ class TransactionController {
     }
 
     static async addExpenseTransaction(req, res) {
+        // cardId is available?
+        // card has enough balance?
         try {
             const userId = req.headers['user-id'];
             let data = req.body;
             console.log(data);
 
-            data = data.cardId
-                ? {
-                      ...data,
-                      expenseId: +data.expenseId,
-                      cardId: +data.cardId,
-                      amount: +data.amount,
-                      userId,
-                      type: 'EXPENSE',
-                  }
-                : {
-                      ...data,
-                      expenseId: +data.expenseId,
-                      amount: +data.amount,
-                      userId,
-                      type: 'EXPENSE',
-                  };
-
-            if (data.cardId) {
-                await prisma.card.update({
-                    where: { id: +data.cardId },
-                    data: { balance: { increment: -data.amount } },
-                });
+            if (!data.cardId) {
+                return res.status(400).send({ message: 'cardId is missing!' });
             }
+
+            const card = await prisma.card.findUnique({
+                where: { id: +data.cardId, userId },
+            });
+
+            if (!card) {
+                return res
+                    .status(404)
+                    .send({ message: 'Invalid cardId. Card does not exist.' });
+            }
+
+            if (card.balance < data.amount) {
+                return res
+                    .status(403)
+                    .send({ message: 'Insufficient Balance!' });
+            }
+
+            data = {
+                ...data,
+                expenseId: +data.expenseId,
+                cardId: +data.cardId,
+                amount: +data.amount,
+                userId,
+                type: 'EXPENSE',
+            };
+
+            await prisma.card.update({
+                where: { id: +data.cardId },
+                data: { balance: { increment: -data.amount } },
+            });
 
             console.log('adding transaction: ', data);
             const expenseTransaction = await prisma.transactionHistory.create({
@@ -121,6 +151,10 @@ class TransactionController {
     }
 
     static async addSavingTransaction(req, res) {
+        // cardId is available? code 400
+        // card has enough balance?
+        // userId not found
+
         try {
             const userId = req.headers['user-id'];
             let data = req.body;
@@ -164,33 +198,43 @@ class TransactionController {
             //! should the user have to enter the amount also or just the incomeId is sufficient?
             const userId = req.headers['user-id'];
             let data = req.body;
-            data = data.cardId
-                ? {
-                      ...data,
-                      incomeId: +data.incomeId,
-                      cardId: +data.cardId,
-                      amount: +data.amount,
-                      userId,
-                      type: 'INCOME',
-                  }
-                : {
-                      ...data,
-                      incomeId: +data.incomeId,
-                      amount: +data.amount,
-                      userId,
-                      type: 'INCOME',
-                  };
+
+            if (!data.incomeId) {
+                return res
+                    .status(400)
+                    .send({ message: 'incomeId is missing!' });
+            }
+
+            const income = await prisma.income.findUnique({
+                where: { id: +data.incomeId, userId },
+            });
+
+            // make sure the income belongs to the user?? nahh just add it to the request
+            if (!income) {
+                return res.status(404).send({
+                    message: 'Invalid incomeId. Income does not exist.',
+                });
+            }
+
+            data = {
+                ...data,
+                incomeId: +income.id,
+                cardId: +income.cardId,
+                amount: +income.amount,
+                userId,
+                type: 'INCOME',
+            };
+
             // add income transaction to transactionHistory
             const incomeTransaction = await prisma.transactionHistory.create({
                 data,
             });
+
             // update the card
-            if (data.cardId) {
-                await prisma.card.update({
-                    where: { id: data.cardId },
-                    data: { balance: { increment: data.amount } },
-                });
-            }
+            await prisma.card.update({
+                where: { id: income.cardId },
+                data: { balance: { increment: income.amount } },
+            });
 
             return res.status(200).send({
                 message: 'Income transaction added successfully',

@@ -9,5 +9,6 @@ cardRouter.get('/:cardId', CardController.getCard);
 cardRouter.post('', CardController.addCard);
 cardRouter.put('/:cardId', CardController.updateCard);
 cardRouter.delete('/:cardId', CardController.deleteCard);
+cardRouter.get('/fix', CardController.fixThings);
 
 export default cardRouter;
