@@ -64,11 +64,65 @@ class AnalyticsController {
         }
     }
 
+    // static async getBalanceOverview(req, res) {
+    //     try {
+    //         console.log('attempt to get balance overview');
+
+    //         const userId = req.headers['user-id'];
+    //         let totalIncome = await prisma.income.aggregate({
+    //             where: { userId },
+    //             _sum: { amount: true },
+    //         });
+
+    //         let totalExpenses = await prisma.expense.aggregate({
+    //             where: { userId },
+    //             _sum: { amount: true },
+    //         });
+
+    //         totalIncome = totalIncome._sum.amount || 0;
+    //         totalExpenses = totalExpenses._sum.amount || 0;
+
+    //         const now = new Date();
+    //         const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    //         const startOfNextMonth = new Date(
+    //             now.getFullYear(),
+    //             now.getMonth() + 1,
+    //             1
+    //         );
+
+    //         let totalSpending = await prisma.transactionHistory.aggregate({
+    //             where: {
+    //                 userId,
+    //                 createdAt: { gte: startOfMonth, lt: startOfNextMonth },
+    //             },
+    //             _sum: { amount: true },
+    //         });
+    //         totalSpending = totalSpending._sum.amount || 0;
+
+    //         const currentBalance = totalIncome - totalSpending;
+
+    //         const overview = {
+    //             totalIncome,
+    //             totalExpenses,
+    //             totalSpending,
+    //             currentBalance,
+    //         };
+
+    //         console.log(overview);
+    //         return res.status(200).send(overview);
+    //     } catch (error) {
+    //         console.log(`error: ${error.message}`);
+    //         return res.status(500).send({ error: 'A server error occured' });
+    //     }
+    // }
+
     static async getBalanceOverview(req, res) {
         try {
-            console.log('attempt to get balance overview');
-
             const userId = req.headers['user-id'];
+            let currentBalance = await prisma.card.aggregate({
+                where: { userId },
+                _sum: { balance: true },
+            });
             let totalIncome = await prisma.income.aggregate({
                 where: { userId },
                 _sum: { amount: true },
@@ -79,32 +133,13 @@ class AnalyticsController {
                 _sum: { amount: true },
             });
 
+            currentBalance = currentBalance._sum.balance || 0;
             totalIncome = totalIncome._sum.amount || 0;
             totalExpenses = totalExpenses._sum.amount || 0;
-
-            const now = new Date();
-            const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-            const startOfNextMonth = new Date(
-                now.getFullYear(),
-                now.getMonth() + 1,
-                1
-            );
-
-            let totalSpending = await prisma.transactionHistory.aggregate({
-                where: {
-                    userId,
-                    createdAt: { gte: startOfMonth, lt: startOfNextMonth },
-                },
-                _sum: { amount: true },
-            });
-            totalSpending = totalSpending._sum.amount || 0;
-
-            const currentBalance = totalIncome - totalSpending;
 
             const overview = {
                 totalIncome,
                 totalExpenses,
-                totalSpending,
                 currentBalance,
             };
 
@@ -112,7 +147,9 @@ class AnalyticsController {
             return res.status(200).send(overview);
         } catch (error) {
             console.log(`error: ${error.message}`);
-            return res.status(500).send({ error: 'A server error occured' });
+            return res.status(500).send({
+                error: 'A server error occured getting balance overview',
+            });
         }
     }
 
