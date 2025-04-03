@@ -7,7 +7,7 @@ class TransactionController {
     static async getAllTransactions(req, res) {
         try {
             const userId = req.headers['user-id'];
-            const transactions = await prisma.transactionHistory.findMany({
+            let transactions = await prisma.transactionHistory.findMany({
                 where: { userId },
                 include: {
                     card: {
@@ -28,6 +28,12 @@ class TransactionController {
                 },
                 orderBy: { createdAt: 'desc' },
             });
+
+            transactions = transactions.map((transaction) => {
+                const date = formatTransactionDate(transaction['createdAt']);
+                return { ...transaction, createdAt: date };
+            });
+
             res.status(200).send(transactions);
         } catch (error) {
             console.error(error);
