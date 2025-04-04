@@ -25,6 +25,11 @@ class TransactionController {
                             title: true,
                         },
                     },
+                    saving: {
+                        select: {
+                            title: true,
+                        },
+                    },
                 },
                 orderBy: { createdAt: 'desc' },
             });
