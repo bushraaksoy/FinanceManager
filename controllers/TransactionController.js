@@ -291,10 +291,17 @@ class TransactionController {
                 where: { id: +transactionId },
             });
 
-            await prisma.card.update({
-                where: { id: transaction.cardId },
-                data: { balance: { increment: -transaction.amount } },
-            });
+            if (transaction.type == 'EXPENSE' || transaction.type == 'SAVING') {
+                await prisma.card.update({
+                    where: { id: transaction.cardId },
+                    data: { balance: { increment: transaction.amount } },
+                });
+            } else {
+                await prisma.card.update({
+                    where: { id: transaction.cardId },
+                    data: { balance: { increment: -transaction.amount } },
+                });
+            }
 
             return res
                 .status(200)
