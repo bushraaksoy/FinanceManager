@@ -169,22 +169,36 @@ class TransactionController {
         try {
             const userId = req.headers['user-id'];
             let data = req.body;
-            data = data.cardId
-                ? {
-                      ...data,
-                      savingId: +data.savingId,
-                      cardId: +data.cardId,
-                      amount: +data.amount,
-                      userId,
-                      type: 'SAVING',
-                  }
-                : {
-                      ...data,
-                      savingId: +data.savingId,
-                      amount: +data.amount,
-                      userId,
-                      type: 'SAVING',
-                  };
+
+            if (!data.cardId) {
+                return res.status(400).send({ message: 'cardId is missing!' });
+            }
+
+            const card = await prisma.card.findUnique({
+                where: { id: +data.cardId, userId },
+            });
+
+            if (!card) {
+                return res
+                    .status(404)
+                    .send({ message: 'Invalid cardId. Card does not exist.' });
+            }
+
+            if (card.balance < data.amount) {
+                return res
+                    .status(403)
+                    .send({ message: 'Insufficient Balance!' });
+            }
+
+            data = {
+                ...data,
+                savingId: +data.savingId,
+                cardId: +data.cardId,
+                amount: +data.amount,
+                userId,
+                type: 'SAVING',
+            };
+
             const savingTransaction = await prisma.transactionHistory.create({
                 data,
             });
@@ -192,6 +206,12 @@ class TransactionController {
                 where: { id: data.savingId },
                 data: { savedAmount: { increment: data.amount } },
             });
+
+            await prisma.card.update({
+                where: { id: +data.cardId },
+                data: { balance: { increment: -data.amount } },
+            });
+
             return res.status(200).send({
                 message: 'Saving transaction added successfully',
                 savingTransaction,
