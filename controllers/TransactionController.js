@@ -1,14 +1,42 @@
 import prisma from '../db/db.config.js';
+import { parsePdf } from '../utils/bankStatementParser.js';
 import { formatDate, formatTransactionDate } from '../utils/formatters.js';
+import fs from 'fs';
 
 class TransactionController {
-    //! TODO: update the balance of a card if cardId is available in the transaction.
     //! TODO: handle transactions when expenses are deleted, or when cards are deleted.
-    static async getAllTransactions(req, res) {
+    static async getTransactions(req, res) {
         try {
             const userId = req.headers['user-id'];
+
+            // start queries
+            const { type, period } = req.query;
+            const now = new Date();
+            const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+            const startOfNextMonth = new Date(
+                now.getFullYear(),
+                now.getMonth() + 1,
+                1
+            );
+
+            const whereClause = { userId };
+            if (type) {
+                whereClause.type = type;
+            }
+
+            if (period) {
+                if (period == 'month') {
+                    whereClause.createdAt = {
+                        gte: startOfMonth,
+                        lt: startOfNextMonth,
+                    };
+                }
+            }
+
+            //end queries
+
             let transactions = await prisma.transactionHistory.findMany({
-                where: { userId },
+                where: whereClause,
                 include: {
                     card: {
                         select: {
@@ -26,59 +54,6 @@ class TransactionController {
                         },
                     },
                     saving: {
-                        select: {
-                            title: true,
-                        },
-                    },
-                },
-                orderBy: { createdAt: 'desc' },
-            });
-
-            transactions = transactions.map((transaction) => {
-                const date = formatTransactionDate(transaction['createdAt']);
-                return { ...transaction, createdAt: date };
-            });
-
-            res.status(200).send(transactions);
-        } catch (error) {
-            console.error(error);
-            res.status(500).send({
-                message: 'Server Error',
-                error: error.message,
-            });
-        }
-    }
-
-    static async getTransactionHistory(req, res) {
-        // order by date decending
-        try {
-            const userId = req.headers['user-id'];
-            const now = new Date();
-            const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-            const startOfNextMonth = new Date(
-                now.getFullYear(),
-                now.getMonth() + 1,
-                1
-            );
-
-            let transactions = await prisma.transactionHistory.findMany({
-                where: {
-                    userId,
-                    // type: 'EXPENSE',
-                    createdAt: { gte: startOfMonth, lt: startOfNextMonth },
-                },
-                include: {
-                    card: {
-                        select: {
-                            title: true,
-                        },
-                    },
-                    expense: {
-                        select: {
-                            title: true,
-                        },
-                    },
-                    income: {
                         select: {
                             title: true,
                         },
@@ -332,6 +307,67 @@ class TransactionController {
                 message: 'Server Error',
                 error: error.message,
             });
+        }
+    }
+    static async uploadBankStatement(req, res) {
+        try {
+            const userId = req.headers['user-id'];
+            const bank = req.params['bank'] || 'kaspi';
+            const { cardId } = req.body;
+
+            if (!userId) {
+                return res.status(400).send({ message: 'userId is missing!' });
+            }
+
+            const user = await prisma.user.findUnique({
+                where: { id: userId },
+            });
+
+            if (!user) {
+                return res.status(400).send({ message: `Invalid userId` });
+            }
+
+            if (!cardId) {
+                return res.status(400).send({ message: 'cardId is missing!' });
+            }
+
+            const card = await prisma.card.findUnique({
+                where: { id: +cardId, userId },
+            });
+
+            if (!card) {
+                return res
+                    .status(404)
+                    .send({ message: 'Invalid cardId. Card does not exist.' });
+            }
+
+            const filePath = `uploads/documents/${req.file.filename}`;
+
+            let transactions = await parsePdf(bank, filePath);
+            transactions = transactions.map((transaction) => ({
+                ...transaction,
+                userId,
+                cardId: +cardId,
+            }));
+
+            console.log(transactions);
+            //! createMany transactions
+            //! balance check? i would need to see if the balance is enough
+            //! balance update
+            //! delete file after action is uoload is done!!
+
+            fs.unlink(filePath, (err) => {
+                if (err) {
+                    console.error('Error deleting file:', err);
+                    return res.status(500).send('Failed to delete file.');
+                }
+                console.log('File deleted successfully');
+            });
+
+            return res.status(200).send({ file: req.file, transactions });
+        } catch (error) {
+            console.log(error);
+            res.status(500).send({ message: 'Error uploading file' });
         }
     }
 }

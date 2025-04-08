@@ -1,10 +1,10 @@
 import { Router } from 'express';
 import { TransactionController } from '../controllers/index.js';
+import upload from '../middleware/UploadMiddleware.js';
 
 const transactionRouter = Router();
 
-transactionRouter.get('', TransactionController.getTransactionHistory);
-transactionRouter.get('/all', TransactionController.getAllTransactions);
+transactionRouter.get('/', TransactionController.getTransactions);
 transactionRouter.put(
     '/:transactionId',
     TransactionController.updateTransaction
@@ -16,5 +16,10 @@ transactionRouter.delete(
 transactionRouter.post('/saving', TransactionController.addSavingTransaction);
 transactionRouter.post('/expense', TransactionController.addExpenseTransaction);
 transactionRouter.post('/income', TransactionController.addIncomeTransaction);
+transactionRouter.post(
+    '/upload',
+    upload.single('bankstatement'),
+    TransactionController.uploadBankStatement
+);
 
 export default transactionRouter;

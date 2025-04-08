@@ -34,12 +34,19 @@ class KaspiBankStrategy extends BankParserStrategy {
         const transactionRows = rows.slice(headerIndex + 1);
         transactionRows.pop();
 
-        return transactionRows.map((row) => ({
-            createdAt: row[0],
-            amount: row[1],
-            type: row[2],
-            title: row[3],
-        }));
+        return transactionRows.map((row) => {
+            const amount = parseFloat(
+                row[1].replace(/[-+₸ ]/g, '').replace(',', '.')
+            );
+            const type = row[2] == 'Replenishment' ? 'INCOME' : 'EXPENSE';
+
+            return {
+                createdAt: row[0],
+                amount: amount,
+                type: type,
+                title: row[3],
+            };
+        });
     }
 }
 
@@ -122,7 +129,7 @@ async function main() {
     try {
         // let's say this type is users selected bank from the frontend(will be selection options) -> and send via qury param;
         const bankType = 'kaspi';
-        const bankStatement = './test/bankstatement.pdf';
+        const bankStatement = 'bankstatement.pdf';
 
         const strategy = getStrategy(bankType);
         if (!strategy) throw new Error(`Opps! unsupported bank: ${bankType}`);
@@ -140,7 +147,25 @@ async function main() {
     }
 }
 
-main();
+// main();
+
+export async function parsePdf(bankType, bankStatement) {
+    try {
+        const strategy = getStrategy(bankType);
+        if (!strategy) throw new Error(`Opps! unsupported bank: ${bankType}`);
+
+        // Parser with kaspi strategy(A)
+        const parser = new BankStatementParser(strategy);
+        let transactions = await parser.parseStatement(bankStatement);
+        // console.log(
+        //     `${bankType.toUpperCase()} Bank Transactions:`,
+        //     transactions
+        // );
+        return transactions;
+    } catch (error) {
+        console.error('Error parsing statement:', error);
+    }
+}
 
 //====================24-Feb 2025====================
 

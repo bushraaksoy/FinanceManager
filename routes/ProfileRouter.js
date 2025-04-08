@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { ProfileController } from '../controllers/index.js';
-import { authenticateJWT } from '../middleware/AuthMiddleware.js';
+import { authenticateJWT } from '../middleware/authMiddleware.js';
 
 const profileRouter = Router();
 
