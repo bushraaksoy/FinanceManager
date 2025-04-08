@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { TransactionController } from '../controllers/index.js';
-import upload from '../middleware/UploadMiddleware.js';
+import upload from '../middleware/uploadMiddleware.js';
 
 const transactionRouter = Router();
 

@@ -1,6 +1,7 @@
 import prisma from '../db/db.config.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+
 class AuthController {
     static async login(req, res) {
         try {
