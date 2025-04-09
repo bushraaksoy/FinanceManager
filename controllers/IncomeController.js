@@ -8,7 +8,7 @@ class IncomeController {
     static async getAllIncomes(req, res) {
         try {
             console.log('getting all incomes');
-            const userId = req.headers['user-id'];
+            const userId = req.userId;
             const incomes = await prisma.income.findMany({
                 where: { userId },
                 select: {
@@ -35,10 +35,11 @@ class IncomeController {
     }
     static async getIncome(req, res) {
         try {
+            const userId = req.userId;
             const { incomeId } = req.params;
 
             const income = await prisma.income.findUnique({
-                where: { id: +incomeId },
+                where: { id: +incomeId, userId },
             });
             res.status(200).send(income);
         } catch (error) {
@@ -51,9 +52,7 @@ class IncomeController {
     }
     static async addIncome(req, res) {
         try {
-            // TODO handle cardId
-            console.log('attempt to add income');
-            const userId = req.headers['user-id'];
+            const userId = req.userId;
             let data = req.body;
             console.log('data ', data);
 
@@ -84,8 +83,7 @@ class IncomeController {
     }
     static async updateIncome(req, res) {
         try {
-            //TODO Handle cardId
-            console.log('attempt to update income');
+            const userId = req.userId;
             const { incomeId } = req.params;
             let data = req.body;
 
@@ -94,7 +92,7 @@ class IncomeController {
             }
 
             const income = await prisma.income.update({
-                where: { id: +incomeId },
+                where: { id: +incomeId, userId },
                 data,
             });
 
@@ -112,10 +110,10 @@ class IncomeController {
     }
     static async deleteIncome(req, res) {
         try {
-            //! should we do anything to the card if a user deletes an income???
+            const userId = req.userId;
             const { incomeId } = req.params;
             const income = await prisma.income.delete({
-                where: { id: +incomeId },
+                where: { id: +incomeId, userId },
             });
             res.status(200).send({
                 message: 'Income deleted successfully',
@@ -132,22 +130,12 @@ class IncomeController {
 
     static async getPendingIncomes(req, res) {
         try {
-            // let pendingIncomes = []
-            // transactions: get all income transactions
-
-            // weeklyIncomes: get all weekly incomes
-            // monthlyIncomes: get all monthly incomes
-
-            // check if we have any income ids from weekly incomes in transactions, if we have check if created at > 7 then add to list if yes, and add to list if its not in transactions (can do every mondays)
-            // check if we have any income ids from monthly incomes in transactions, if we have check if created at > 1 month then add to list if yes, and add to list if its not in transactions (can do every 1st of the month?)
-
-            const userId = req.headers['user-id'];
+            const userId = req.userId;
             const now = new Date();
             const startOfWeek = new Date(now);
             startOfWeek.setDate(now.getDate() - now.getDay()); // Start of the week (Sunday)
             const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
-            // Fetch all income transactions in one query
             const incomeTransactions = await prisma.transactionHistory.findMany(
                 {
                     where: { userId, type: 'INCOME' },
@@ -155,13 +143,11 @@ class IncomeController {
                 }
             );
 
-            // Convert transactions to a Map for quick lookups
             const transactionMap = new Map();
             incomeTransactions.forEach((transaction) => {
                 transactionMap.set(transaction.incomeId, transaction.createdAt);
             });
 
-            // Fetch all incomes in one go
             const incomes = await prisma.income.findMany({
                 where: { userId },
                 // select: { id: true, frequency: true },
@@ -171,7 +157,6 @@ class IncomeController {
 
             let pendingIncomes = [];
 
-            // Process incomes
             incomes.forEach((income) => {
                 const lastTransactionDate = transactionMap.get(income.id);
                 const isMissing = !lastTransactionDate;

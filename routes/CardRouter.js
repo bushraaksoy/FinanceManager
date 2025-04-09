@@ -1,14 +1,13 @@
 import { Router } from 'express';
 import CardController from '../controllers/CardController.js';
+import { authenticateUserId } from '../middleware/authMiddleware.js';
 
 const cardRouter = Router();
 
-cardRouter.get('', CardController.getAllCards);
-cardRouter.get('/details', CardController.getCardsDetails);
-// cardRouter.get('/fix', CardController.fixThings);
-cardRouter.get('/:cardId', CardController.getCard);
-cardRouter.post('', CardController.addCard);
-cardRouter.put('/:cardId', CardController.updateCard);
-cardRouter.delete('/:cardId', CardController.deleteCard);
+cardRouter.get('', authenticateUserId, CardController.getAllCards);
+cardRouter.get('/:cardId', authenticateUserId, CardController.getCard);
+cardRouter.post('', authenticateUserId, CardController.addCard);
+cardRouter.put('/:cardId', authenticateUserId, CardController.updateCard);
+cardRouter.delete('/:cardId', authenticateUserId, CardController.deleteCard);
 
 export default cardRouter;

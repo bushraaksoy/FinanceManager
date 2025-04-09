@@ -4,7 +4,7 @@ import { calculateMonthlySaving } from '../utils/savingUtils.js';
 class SavingController {
     static async getAllSavings(req, res) {
         try {
-            const userId = req.headers['user-id'];
+            const userId = req.userId;
             const savings = await prisma.saving.findMany({ where: { userId } });
             res.status(200).send({ savings: savings });
         } catch (error) {
@@ -17,10 +17,11 @@ class SavingController {
     }
     static async getSaving(req, res) {
         try {
+            const userId = req.userId;
             const { savingId } = req.params;
 
             const saving = await prisma.saving.findUnique({
-                where: { id: +savingId },
+                where: { id: +savingId, userId },
             });
             res.status(200).send({ saving });
         } catch (error) {
@@ -33,7 +34,7 @@ class SavingController {
     }
     static async addSaving(req, res) {
         try {
-            const userId = req.headers['user-id'];
+            const userId = req.userId;
             const data = req.body;
             console.log('data ', data);
             const savedAmount = 0;
@@ -60,10 +61,11 @@ class SavingController {
     }
     static async updateSaving(req, res) {
         try {
+            const userId = req.userId;
             const { savingId } = req.params;
             const data = req.body;
             const saving = await prisma.saving.update({
-                where: { id: +savingId },
+                where: { id: +savingId, userId },
                 data,
             });
             res.status(200).send({
@@ -82,7 +84,7 @@ class SavingController {
         try {
             const { savingId } = req.params;
             const saving = await prisma.saving.delete({
-                where: { id: +savingId },
+                where: { id: +savingId, userId },
             });
             res.status(200).send({
                 message: 'Saving deleted successfully',

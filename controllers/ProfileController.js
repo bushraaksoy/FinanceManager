@@ -4,12 +4,7 @@ import { formatDate } from '../utils/formatters.js';
 class ProfileController {
     static async getUserProfile(req, res) {
         try {
-            const userId = req.headers['user-id'];
-            // const userId = req.user.userId;
-
-            if (!userId) {
-                return res.status(400).send({ error: 'User ID is missing' });
-            }
+            const userId = req.userId;
 
             const profile = await prisma.user.findUnique({
                 where: { id: userId },
@@ -32,7 +27,7 @@ class ProfileController {
 
     static async updateUserProfile(req, res) {
         try {
-            const userId = req.headers['user-id'];
+            const userId = req.userId;
 
             if (!userId) {
                 return res.status(400).send({ error: 'User ID is missing' });

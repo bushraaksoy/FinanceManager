@@ -7,9 +7,8 @@ class TransactionController {
     //! TODO: handle transactions when expenses are deleted, or when cards are deleted.
     static async getTransactions(req, res) {
         try {
-            const userId = req.headers['user-id'];
+            const userId = req.userId;
 
-            // start queries
             const { type, period } = req.query;
             const now = new Date();
             const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -32,8 +31,6 @@ class TransactionController {
                     };
                 }
             }
-
-            //end queries
 
             let transactions = await prisma.transactionHistory.findMany({
                 where: whereClause,
@@ -78,32 +75,9 @@ class TransactionController {
     }
 
     static async addExpenseTransaction(req, res) {
-        // cardId is available?
-        // card has enough balance?
         try {
-            const userId = req.headers['user-id'];
+            const userId = req.userId;
             let data = req.body;
-            console.log(data);
-
-            if (!data.cardId) {
-                return res.status(400).send({ message: 'cardId is missing!' });
-            }
-
-            const card = await prisma.card.findUnique({
-                where: { id: +data.cardId, userId },
-            });
-
-            if (!card) {
-                return res
-                    .status(404)
-                    .send({ message: 'Invalid cardId. Card does not exist.' });
-            }
-
-            if (card.balance < data.amount) {
-                return res
-                    .status(403)
-                    .send({ message: 'Insufficient Balance!' });
-            }
 
             data = {
                 ...data,
@@ -137,12 +111,8 @@ class TransactionController {
     }
 
     static async addSavingTransaction(req, res) {
-        // cardId is available? code 400
-        // card has enough balance?
-        // userId not found
-
         try {
-            const userId = req.headers['user-id'];
+            const userId = req.userId;
             let data = req.body;
 
             if (!data.cardId) {
@@ -156,7 +126,7 @@ class TransactionController {
             if (!card) {
                 return res
                     .status(404)
-                    .send({ message: 'Invalid cardId. Card does not exist.' });
+                    .send({ message: 'Invalid cardId. Card not found.' });
             }
 
             if (card.balance < data.amount) {

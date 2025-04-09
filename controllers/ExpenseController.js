@@ -4,7 +4,7 @@ class ExpenseController {
     // TODO: Handle fized expenses like subscriptions and rent and so on
     static async getAllExpenses(req, res) {
         try {
-            const userId = req.headers['user-id'];
+            const userId = req.userId;
             let expenses = await prisma.expense.findMany({
                 where: { userId },
             });
@@ -54,10 +54,10 @@ class ExpenseController {
     }
     static async getExpense(req, res) {
         try {
+            const userId = req.userId;
             const { expenseId } = req.params;
-
             const expense = await prisma.expense.findUnique({
-                where: { id: +expenseId },
+                where: { id: +expenseId, userId },
             });
             res.status(200).send(expense);
         } catch (error) {
@@ -70,7 +70,7 @@ class ExpenseController {
     }
     static async addExpense(req, res) {
         try {
-            const userId = req.headers['user-id'];
+            const userId = req.userId;
             const data = req.body;
             const category = data.category ? data.category : 'OTHER';
             console.log('data ', data);
@@ -91,10 +91,11 @@ class ExpenseController {
     }
     static async updateExpense(req, res) {
         try {
+            const userId = req.userId;
             const { expenseId } = req.params;
             const data = req.body;
             const expense = await prisma.expense.update({
-                where: { id: +expenseId },
+                where: { id: +expenseId, userId },
                 data,
             });
             res.status(200).send({
@@ -111,9 +112,10 @@ class ExpenseController {
     }
     static async deleteExpense(req, res) {
         try {
+            const userId = req.userId;
             const { expenseId } = req.params;
             const expense = await prisma.expense.delete({
-                where: { id: +expenseId },
+                where: { id: +expenseId, userId },
             });
             res.status(200).send({
                 message: 'Expense deleted successfully',

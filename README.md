@@ -320,3 +320,9 @@ for this we render all of them which have a "createdAt" or "date" that are > 7 d
 sounds good.
 
 maybe i have an endpoint like /incomes/pendingIncomes ?? or
+
+    // GET
+    // /incomeOverview
+    // /incomeTrend
+    // /expenseOverview
+    // /expenseTrend

@@ -127,7 +127,7 @@ class AnalyticsController {
         }
     }
 
-    static async getTransactionSummary(req, res) {
+    static async getMonthlyTransactions(req, res) {
         try {
             const userId = req.headers['user-id'];
             let transactionSummary = await prisma.$queryRaw`
@@ -169,11 +169,54 @@ class AnalyticsController {
         }
     }
 
-    // GET
-    // /incomeOverview
-    // /incomeTrend
-    // /expenseOverview
-    // /expenseTrend
+    static async getTransactionSummary(req, res) {
+        try {
+            const userId = req.userId;
+            const now = new Date();
+            const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+            const startOfNextMonth = new Date(
+                now.getFullYear(),
+                now.getMonth() + 1,
+                1
+            );
+
+            let totalSpending = await prisma.transactionHistory.aggregate({
+                where: {
+                    userId,
+                    type: 'EXPENSE',
+                    createdAt: { gte: startOfMonth, lt: startOfNextMonth },
+                },
+                _sum: { amount: true },
+            });
+            let totalSaving = await prisma.transactionHistory.aggregate({
+                where: {
+                    userId,
+                    type: 'SAVING',
+                    createdAt: { gte: startOfMonth, lt: startOfNextMonth },
+                },
+                _sum: { amount: true },
+            });
+            let totalIncome = await prisma.transactionHistory.aggregate({
+                where: {
+                    userId,
+                    type: 'INCOME',
+                    createdAt: { gte: startOfMonth, lt: startOfNextMonth },
+                },
+                _sum: { amount: true },
+            });
+
+            totalSpending = totalSpending._sum.amount || 0;
+            totalSaving = totalSaving._sum.amount || 0;
+            totalIncome = totalIncome._sum.amount || 0;
+
+            return res
+                .status(200)
+                .send({ totalSpending, totalSaving, totalIncome });
+        } catch (error) {
+            console.log(`error: ${error}`);
+            return res.status(500).send({ error: 'A server error occured' });
+        }
+    }
 }
 
 export default AnalyticsController;
