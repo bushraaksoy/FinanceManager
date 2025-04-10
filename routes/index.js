@@ -9,6 +9,7 @@ import savingsRouter from './SavingRouter.js';
 import transactionRouter from './TransactionRouter.js';
 import analyticsRouter from './AnalyticsRouter.js';
 import cardRouter from './CardRouter.js';
+import documentRouter from './DocumentRouter.js';
 
 const router = Router();
 
@@ -26,5 +27,6 @@ router.use('/savings', savingsRouter);
 router.use('/transactions', transactionRouter);
 router.use('/analytics', analyticsRouter);
 router.use('/cards', cardRouter);
+router.use('/document', documentRouter);
 
 export default router;

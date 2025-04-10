@@ -6,3 +6,4 @@ export { default as SavingController } from './SavingController.js';
 export { default as ProfileController } from './ProfileController.js';
 export { default as AnalyticsController } from './AnalyticsController.js';
 export { default as TransactionController } from './TransactionController.js';
+export { default as DocumentController } from './DocumentController.js';
