@@ -38,7 +38,6 @@ transactionRouter.post(
 transactionRouter.post(
     '/income',
     authenticateUserId,
-    validateCardId,
     TransactionController.addIncomeTransaction
 );
 transactionRouter.post(

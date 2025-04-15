@@ -19,19 +19,25 @@ export const authenticateJWT = (req, res, next) => {
 };
 
 export const authenticateUserId = async (req, res, next) => {
-    const userId = req.headers['user-id'];
+    try {
+        const userId = req.headers['user-id'];
+        console.log('user-id: ', userId);
 
-    if (!userId) {
-        return res.status(400).send({ message: 'userId is missing!' });
+        if (!userId) {
+            return res.status(400).send({ message: 'userId is missing!' });
+        }
+
+        const user = await prisma.user.findUnique({ where: { id: userId } });
+        console.log(user);
+
+        if (!user) {
+            return res
+                .status(404)
+                .send({ message: 'Invalid userId. User not found.' });
+        }
+        req.userId = userId;
+        next();
+    } catch (error) {
+        console.log(error);
     }
-
-    const user = await prisma.user.findUnique({ where: { id: userId } });
-
-    if (!user) {
-        return res
-            .status(404)
-            .send({ message: 'Invalid userId. User not found.' });
-    }
-    req.userId = userId;
-    next();
 };

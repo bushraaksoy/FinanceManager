@@ -10,10 +10,15 @@ documentRouter.post(
     '/bankstatement',
     upload.single('bankstatement'),
     authenticateUserId,
-    validateCardId,
     DocumentController.uploadBankStatement
 );
+documentRouter.post(
+    '/confirmBankstatement',
+    authenticateUserId,
+    validateCardId,
+    DocumentController.confirmBankStatementTransactions
+);
 
-documentRouter.get('/meal-plan', DocumentController.promptGpt);
+documentRouter.get('/gpt', DocumentController.promptGpt);
 
 export default documentRouter;

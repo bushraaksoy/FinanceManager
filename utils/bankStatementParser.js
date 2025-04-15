@@ -34,26 +34,28 @@ class KaspiBankStrategy extends BankParserStrategy {
         const transactionRows = rows.slice(headerIndex + 1);
         transactionRows.pop();
 
-        return transactionRows.map((row) => {
-            const amount = parseFloat(
-                row[1].replace(/[-+₸ ]/g, '').replace(',', '.')
-            );
-            const type = row[2] == 'Replenishment' ? 'INCOME' : 'EXPENSE';
+        return transactionRows
+            .filter((row) => row.length >= 4)
+            .map((row) => {
+                const amount = parseFloat(
+                    row[1].replace(/[-+₸ ]/g, '').replace(',', '.')
+                );
+                const type = row[2] == 'Replenishment' ? 'INCOME' : 'EXPENSE';
 
-            const [day, month, year] = row[0].split('.');
-            const fullYear = year.length === 2 ? `20${year}` : year; // assume 20xx
+                const [day, month, year] = row[0].split('.');
+                const fullYear = year.length === 2 ? `20${year}` : year; // assume 20xx
 
-            const isoDate = new Date(
-                `${fullYear}-${month}-${day}`
-            ).toISOString();
+                const isoDate = new Date(
+                    `${fullYear}-${month}-${day}`
+                ).toISOString();
 
-            return {
-                createdAt: isoDate,
-                amount: amount,
-                type: type,
-                title: row[3],
-            };
-        });
+                return {
+                    createdAt: isoDate,
+                    amount: amount,
+                    type: type,
+                    title: row[3],
+                };
+            });
     }
 }
 
