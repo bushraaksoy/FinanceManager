@@ -21,14 +21,12 @@ export const authenticateJWT = (req, res, next) => {
 export const authenticateUserId = async (req, res, next) => {
     try {
         const userId = req.headers['user-id'];
-        console.log('user-id: ', userId);
 
         if (!userId) {
             return res.status(400).send({ message: 'userId is missing!' });
         }
 
         const user = await prisma.user.findUnique({ where: { id: userId } });
-        console.log(user);
 
         if (!user) {
             return res

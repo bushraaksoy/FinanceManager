@@ -2,8 +2,8 @@
 
 // import as usual;
 import { PdfReader } from 'pdfreader';
+import { isAmountNoSign } from '../services/statement-parser/utils/regexUtils.js';
 
-// INTERFACE(fake one) -> there's no interface in JS, so this will act like interface;
 class BankParserStrategy {
     findHeaderIndex(rows) {
         throw new Error('findHeaderIndex method must be implemented');
@@ -14,7 +14,6 @@ class BankParserStrategy {
     }
 }
 
-// Concrete Strategy(A) for Kaspi bank(give me my money)
 class KaspiBankStrategy extends BankParserStrategy {
     findHeaderIndex(rows) {
         return rows.findIndex(
@@ -27,7 +26,6 @@ class KaspiBankStrategy extends BankParserStrategy {
     }
 
     processTransactions(rows) {
-        // It's your own code. just minor changers(separation = more clear)
         const headerIndex = this.findHeaderIndex(rows);
         if (headerIndex === -1) return [];
 
@@ -45,12 +43,8 @@ class KaspiBankStrategy extends BankParserStrategy {
                 const [day, month, year] = row[0].split('.');
                 const fullYear = year.length === 2 ? `20${year}` : year; // assume 20xx
 
-                const isoDate = new Date(
-                    `${fullYear}-${month}-${day}`
-                ).toISOString();
-
                 return {
-                    createdAt: isoDate,
+                    createdAt: `${day}.${month}.${fullYear}`,
                     amount: amount,
                     type: type,
                     title: row[3],
@@ -62,38 +56,110 @@ class KaspiBankStrategy extends BankParserStrategy {
 // Concrete Strategy(B) for halyk Bank(ppl bank? whaat?)
 class HalykBankStrategy extends BankParserStrategy {
     findHeaderIndex(rows) {
-        // no more headers? u can send me i will filter for u. my filter cute. pinch u <3
         return rows.findIndex((row) => row.includes('Total:'));
     }
 
-    processTransactions(rows) {
-        // same here -> ur proper transaction processing will be
-        const headerIndex = this.findHeaderIndex(rows);
-        const lastIndex = rows.findLastIndex(
+    findFooterIndex(rows) {
+        return rows.findLastIndex(
             (row) => row.includes('Account') && row.includes('Number')
         );
+    }
+
+    processTransactions(rows) {
+        const headerIndex = this.findHeaderIndex(rows);
+        const lastIndex = this.findFooterIndex(rows);
+        const transactions = [];
 
         if (headerIndex === -1) return [];
 
-        return rows.slice(headerIndex + 1, lastIndex);
+        rows = rows.slice(headerIndex + 1, lastIndex);
+
+        const unwantedWords = [
+            'Total:',
+            'Account',
+            'Number',
+            'Date',
+            'Fee',
+            'currency',
+        ];
+        rows = rows.filter(
+            (row) => !unwantedWords.some((word) => row.includes(word))
+        );
+
+        rows = rows.map((row, inx) => {
+            const convertedRow = row.map((str) => {
+                if (isAmountNoSign(str)) {
+                    return parseFloat(
+                        str.replace(/[\u00A0 ]/g, '').replace(',', '.')
+                    );
+                }
+                return str;
+            });
+
+            return convertedRow;
+        });
+
+        let cleanedRows = [];
+
+        rows.forEach((row, inx) => {
+            if (row.length >= 9) {
+                // merge description
+                let description = row[2];
+                let i = 3;
+
+                while (i < row.length) {
+                    const value = row[i];
+                    if (typeof value == 'number' || value == '-') {
+                        break;
+                    }
+                    description += ' ' + value;
+                    row.splice(i, 1);
+                }
+                row[2] = description;
+                return cleanedRows.push(row);
+            } else {
+                const str = row.join(' ');
+                cleanedRows[cleanedRows.length - 1][2] += ' ' + str;
+            }
+        });
+
+        for (const row of cleanedRows) {
+            let title = row[2]
+                .replace(/Merchant Payment Transaction/gi, '')
+                .trim();
+
+            if (row.includes('-')) {
+                transactions.push({
+                    createdAt: row[0],
+                    title: title,
+                    amount: row.at(-3),
+                    type: 'EXPENSE',
+                });
+            } else {
+                transactions.push({
+                    createdAt: row[0],
+                    title: title,
+                    amount: row.at(-4),
+                    type: 'INCOME',
+                });
+            }
+        }
+
+        return transactions;
     }
 }
 
-// Context CLASSSS that uses the strategy(my cute strategy)
 class BankStatementParser {
     constructor(strategy) {
         this.strategy = strategy;
         this.rows = {};
-        this.bankStatementRows = [];
+        this.rows = [];
     }
 
     setStrategy(strategy) {
         this.strategy = strategy;
     }
 
-    // as u can see cute, following DRY just.
-    // handling common PDF reading logic.
-    // u can creat as many concrete strategies(banks) and yet use the same logic.
     async parseStatement(path) {
         return new Promise((resolve, reject) => {
             new PdfReader().parseFileItems(path, (err, item) => {
@@ -104,12 +170,11 @@ class BankStatementParser {
                     console.warn('end of file');
 
                     Object.keys(this.rows).forEach((row) => {
-                        this.bankStatementRows.push(this.rows[row]);
+                        this.rows.push(this.rows[row]);
                     });
 
-                    // here we just use our this.strategy; -> this.kaspiiii this.halykk this.cute ---> strategy to process transactions
                     const transactions = this.strategy.processTransactions(
-                        this.bankStatementRows
+                        this.rows
                     );
                     resolve(transactions);
                 } else if (item.text) {
@@ -122,7 +187,6 @@ class BankStatementParser {
     }
 }
 
-// strategy Factory -> for dynamiclly selecting users' bank
 function getStrategy(bankType) {
     // u can place it somewhere else even and get rid of this function. but it's just better and more readable.
     const strategies = {
@@ -137,13 +201,12 @@ function getStrategy(bankType) {
 async function main() {
     try {
         // let's say this type is users selected bank from the frontend(will be selection options) -> and send via qury param;
-        const bankType = 'kaspi';
-        const bankStatement = 'bankstatement.pdf';
+        const bankType = 'halyk';
+        const bankStatement = 'halykbankstatement.pdf';
 
         const strategy = getStrategy(bankType);
         if (!strategy) throw new Error(`Opps! unsupported bank: ${bankType}`);
 
-        // Parser with kaspi strategy(A)
         const parser = new BankStatementParser(strategy);
         let transactions = await parser.parseStatement(bankStatement);
 
@@ -156,20 +219,14 @@ async function main() {
     }
 }
 
-// main();
-
 export async function parsePdf(bankType, bankStatement) {
     try {
         const strategy = getStrategy(bankType);
         if (!strategy) throw new Error(`Opps! unsupported bank: ${bankType}`);
 
-        // Parser with kaspi strategy(A)
         const parser = new BankStatementParser(strategy);
         let transactions = await parser.parseStatement(bankStatement);
-        // console.log(
-        //     `${bankType.toUpperCase()} Bank Transactions:`,
-        //     transactions
-        // );
+
         return transactions;
     } catch (error) {
         console.error('Error parsing statement:', error);

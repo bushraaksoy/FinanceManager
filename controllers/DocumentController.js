@@ -8,8 +8,12 @@ class DocumentController {
     static async uploadBankStatement(req, res) {
         try {
             const userId = req.userId;
-            const bank = req.params['bank'] || 'kaspi';
-            console.log(req.file);
+            const bank = req.query['bank'];
+
+            if (!bank) {
+                return res.status(404).send({ message: 'bank is missing' });
+            }
+
             const filePath = `uploads/documents/${req.file.filename}`;
 
             let transactions = await parsePdf(bank, filePath);
@@ -22,10 +26,10 @@ class DocumentController {
                 console.log('File deleted successfully');
             });
 
-            transactions = transactions.map((transaction) => {
-                const date = formatTransactionDate(transaction['createdAt']);
-                return { ...transaction, createdAt: date };
-            });
+            // transactions = transactions.map((transaction) => {
+            //     const date = formatTransactionDate(transaction['createdAt']);
+            //     return { ...transaction, createdAt: date };
+            // });
 
             return res.status(200).send(transactions);
         } catch (error) {
