@@ -160,9 +160,9 @@ class BankStatementParser {
         this.strategy = strategy;
     }
 
-    async parseStatement(path) {
+    async parseStatement(buffer) {
         return new Promise((resolve, reject) => {
-            new PdfReader().parseFileItems(path, (err, item) => {
+            new PdfReader().parseBuffer(buffer, (err, item) => {
                 if (err) {
                     console.error('error:', err);
                     reject(err);
@@ -219,13 +219,13 @@ async function main() {
     }
 }
 
-export async function parsePdf(bankType, bankStatement) {
+export async function parsePdf(bankType, bankStatementBuffer) {
     try {
         const strategy = getStrategy(bankType);
         if (!strategy) throw new Error(`Opps! unsupported bank: ${bankType}`);
 
         const parser = new BankStatementParser(strategy);
-        let transactions = await parser.parseStatement(bankStatement);
+        let transactions = await parser.parseStatement(bankStatementBuffer);
 
         return transactions;
     } catch (error) {

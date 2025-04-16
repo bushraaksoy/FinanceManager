@@ -6,17 +6,17 @@ import fs from 'fs/promises';
 class DocumentController {
     static async uploadBankStatement(req, res) {
         try {
+            console.log(req.file);
             const bank = req.query['bank'];
 
             if (!bank) {
                 return res.status(404).send({ message: 'bank is missing' });
             }
 
-            const filePath = `uploads/documents/${req.file.filename}`;
+            const fileBuffer = req.file.buffer;
 
-            let transactions = await parsePdf(bank, filePath);
+            let transactions = await parsePdf(bank, fileBuffer);
 
-            await fs.unlink(filePath);
             return res.status(200).send(transactions);
         } catch (error) {
             console.log(error);
