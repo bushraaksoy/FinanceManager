@@ -1,13 +1,11 @@
 import prisma from '../db/db.config.js';
 import { parsePdf } from '../utils/bankStatementParser.js';
-import { formatTransactionDate } from '../utils/formatters.js';
 import openai from '../utils/openai.js';
 import fs from 'fs/promises';
 
 class DocumentController {
     static async uploadBankStatement(req, res) {
         try {
-            const userId = req.userId;
             const bank = req.query['bank'];
 
             if (!bank) {
@@ -18,19 +16,7 @@ class DocumentController {
 
             let transactions = await parsePdf(bank, filePath);
 
-            await fs.unlink(filePath, (err) => {
-                if (err) {
-                    console.error('Error deleting file:', err);
-                    return res.status(500).send('Failed to delete file.');
-                }
-                console.log('File deleted successfully');
-            });
-
-            // transactions = transactions.map((transaction) => {
-            //     const date = formatTransactionDate(transaction['createdAt']);
-            //     return { ...transaction, createdAt: date };
-            // });
-
+            await fs.unlink(filePath);
             return res.status(200).send(transactions);
         } catch (error) {
             console.log(error);
