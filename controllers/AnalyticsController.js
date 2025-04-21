@@ -133,33 +133,7 @@ class AnalyticsController {
             const period = req.query?.period;
             let transactionSummary = [];
 
-            if (period == '6') {
-                transactionSummary = await prisma.$queryRaw`
-                WITH date_series AS (   
-                SELECT GENERATE_SERIES(
-                    DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '5 months',
-                    DATE_TRUNC('month', CURRENT_DATE) + INTERVAL '1 month' - INTERVAL '1 day',
-                    INTERVAL '1 day'
-                ) AS date
-                )
-                SELECT 
-                date_series.date AS date,
-                COALESCE(SUM("amount"), 0) AS amount
-                FROM date_series
-                LEFT JOIN "TransactionHistory"
-                ON DATE("createdAt") = date_series.date 
-                AND "userId" = ${userId} 
-                AND "type" = 'EXPENSE'
-                GROUP BY date_series.date
-                ORDER BY date_series.date ASC;
-
-            `;
-
-                transactionSummary = transactionSummary.map((transaction) => {
-                    const date = formatTransactionDate(transaction['date']);
-                    return { ...transaction, date };
-                });
-            } else {
+            if (period == '1') {
                 transactionSummary = await prisma.$queryRaw`
                 WITH date_series AS (
                 SELECT GENERATE_SERIES(
@@ -182,6 +156,38 @@ class AnalyticsController {
                     const date = formatTransactionDate(transaction['date']);
                     return { ...transaction, date };
                 });
+            } else {
+                const interval = parseInt(period) - 1 || 1;
+                console.log('interval', interval);
+                transactionSummary = await prisma.$queryRaw`
+                WITH month_series AS (
+                SELECT GENERATE_SERIES(
+                    DATE_TRUNC('month', CURRENT_DATE) -  INTERVAL '1 month' * ${interval},
+                    DATE_TRUNC('month', CURRENT_DATE),
+                    INTERVAL '1 month'
+                ) AS month_start
+                )
+                SELECT
+                month_series.month_start AS month,
+                COALESCE(SUM("amount"), 0) AS amount
+                FROM month_series
+                LEFT JOIN "TransactionHistory"
+                ON DATE_TRUNC('month', "createdAt"::timestamp) = month_series.month_start
+                AND "userId" = ${userId}
+                AND "type" = 'EXPENSE'
+                GROUP BY month_series.month_start
+                ORDER BY month_series.month_start ASC;
+            `;
+
+                transactionSummary = transactionSummary.map((transaction) => {
+                    let month = new Date(transaction['month']).toLocaleString(
+                        'en-US',
+                        { month: 'long', year: 'numeric' }
+                    );
+                    return { ...transaction, month };
+                });
+
+                console.log(transactionSummary);
             }
 
             return res.status(200).send(transactionSummary);
@@ -194,9 +200,15 @@ class AnalyticsController {
     static async getTransactionSummary(req, res) {
         try {
             const userId = req.userId;
+            const period = req.query?.period;
+            const interval = period - 1 || 0;
             const now = new Date();
-            const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-            const startOfNextMonth = new Date(
+            const startPeriod = new Date(
+                now.getFullYear(),
+                now.getMonth() - interval,
+                1
+            );
+            const endPeriod = new Date(
                 now.getFullYear(),
                 now.getMonth() + 1,
                 1
@@ -206,7 +218,7 @@ class AnalyticsController {
                 where: {
                     userId,
                     type: 'EXPENSE',
-                    createdAt: { gte: startOfMonth, lt: startOfNextMonth },
+                    createdAt: { gte: startPeriod, lt: endPeriod },
                 },
                 _sum: { amount: true },
             });
@@ -214,7 +226,7 @@ class AnalyticsController {
                 where: {
                     userId,
                     type: 'SAVING',
-                    createdAt: { gte: startOfMonth, lt: startOfNextMonth },
+                    createdAt: { gte: startPeriod, lt: endPeriod },
                 },
                 _sum: { amount: true },
             });
@@ -222,7 +234,7 @@ class AnalyticsController {
                 where: {
                     userId,
                     type: 'INCOME',
-                    createdAt: { gte: startOfMonth, lt: startOfNextMonth },
+                    createdAt: { gte: startPeriod, lt: endPeriod },
                 },
                 _sum: { amount: true },
             });
