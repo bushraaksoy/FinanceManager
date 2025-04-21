@@ -67,19 +67,49 @@ class AnalyticsController {
     static async getBalanceOverview(req, res) {
         try {
             const userId = req.headers['user-id'];
+            const period = req.query?.period;
+            const interval = period - 1 || 0;
+            const now = new Date();
+            const startPeriod = new Date(
+                now.getFullYear(),
+                now.getMonth() - interval,
+                1
+            );
+            const endPeriod = new Date(
+                now.getFullYear(),
+                now.getMonth() + 1,
+                1
+            );
             let currentBalance = await prisma.card.aggregate({
                 where: { userId },
                 _sum: { balance: true },
             });
-            let totalIncome = await prisma.income.aggregate({
-                where: { userId },
+            let totalExpenses = await prisma.transactionHistory.aggregate({
+                where: {
+                    userId,
+                    type: 'EXPENSE',
+                    createdAt: { gte: startPeriod, lt: endPeriod },
+                },
+                _sum: { amount: true },
+            });
+            let totalIncome = await prisma.transactionHistory.aggregate({
+                where: {
+                    userId,
+                    type: 'INCOME',
+                    createdAt: { gte: startPeriod, lt: endPeriod },
+                },
                 _sum: { amount: true },
             });
 
-            let totalExpenses = await prisma.expense.aggregate({
-                where: { userId },
-                _sum: { amount: true },
-            });
+            // let totalIncome = await prisma.income.aggregate({
+            //     where: { userId },
+            //     _sum: { amount: true },
+            // });
+
+            // let totalExpenses = await prisma.expense.aggregate({
+            //     where: { userId },
+            //     _sum: { amount: true },
+            // });
 
             currentBalance = currentBalance._sum.balance || 0;
             totalIncome = totalIncome._sum.amount || 0;
@@ -222,18 +252,19 @@ class AnalyticsController {
                 },
                 _sum: { amount: true },
             });
-            let totalSaving = await prisma.transactionHistory.aggregate({
-                where: {
-                    userId,
-                    type: 'SAVING',
-                    createdAt: { gte: startPeriod, lt: endPeriod },
-                },
-                _sum: { amount: true },
-            });
             let totalIncome = await prisma.transactionHistory.aggregate({
                 where: {
                     userId,
                     type: 'INCOME',
+                    createdAt: { gte: startPeriod, lt: endPeriod },
+                },
+                _sum: { amount: true },
+            });
+
+            let totalSaving = await prisma.transactionHistory.aggregate({
+                where: {
+                    userId,
+                    type: 'SAVING',
                     createdAt: { gte: startPeriod, lt: endPeriod },
                 },
                 _sum: { amount: true },
