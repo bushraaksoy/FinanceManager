@@ -43,5 +43,10 @@ analyticsRouter.get(
     authenticateUserId,
     AnalyticsController.getTransactionSummary
 );
+analyticsRouter.get(
+    '/monthly-comparison',
+    authenticateUserId,
+    AnalyticsController.getMonthlyComparison
+);
 
 export default analyticsRouter;
