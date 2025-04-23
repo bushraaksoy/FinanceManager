@@ -283,147 +283,62 @@ class AnalyticsController {
 
     static async getMonthlyComparison(req, res) {
         try {
-            // income, spending, saving $ comparison.
-            const userId = req.userId; //pass userId middleware
+            const userId = req.userId;
 
             const now = new Date();
-            const startLastMonth = new Date(
-                now.getFullYear(),
-                now.getMonth() - 1,
-                1
-            );
-            const endLastMonth = new Date(
-                now.getFullYear(),
-                now.getMonth() - 1,
-                now.getDate()
-            );
-            const startThisMonth = new Date(
-                now.getFullYear(),
-                now.getMonth(),
-                1
-            );
-            const endThisMonth = new Date(
-                now.getFullYear(),
-                now.getMonth(),
-                now.getDate()
-            );
-            const message = `Comparison between ${startLastMonth} to ${endLastMonth}, and ${startThisMonth} to ${endThisMonth}`;
-
-            let lastMonthExpenses = await prisma.transactionHistory.aggregate({
-                where: {
-                    userId,
-                    type: 'EXPENSE',
-                    createdAt: { gte: startLastMonth, lte: endLastMonth },
-                },
-                _sum: { amount: true },
-            });
-            let lastMonthIncome = await prisma.transactionHistory.aggregate({
-                where: {
-                    userId,
-                    type: 'INCOME',
-                    createdAt: { gte: startLastMonth, lte: endLastMonth },
-                },
-                _sum: { amount: true },
-            });
-            let lastMonthSaving = await prisma.transactionHistory.aggregate({
-                where: {
-                    userId,
-                    type: 'SAVING',
-                    createdAt: { gte: startLastMonth, lte: endLastMonth },
-                },
-                _sum: { amount: true },
+            const getRange = (monthOffset) => ({
+                start: new Date(
+                    now.getFullYear(),
+                    now.getMonth() + monthOffset,
+                    1
+                ),
+                end: new Date(
+                    now.getFullYear(),
+                    now.getMonth() + monthOffset,
+                    now.getDate()
+                ),
             });
 
-            let thisMonthExpenses = await prisma.transactionHistory.aggregate({
-                where: {
-                    userId,
-                    type: 'EXPENSE',
-                    createdAt: { gte: startThisMonth, lte: endThisMonth },
-                },
-                _sum: { amount: true },
-            });
-            let thisMonthIncome = await prisma.transactionHistory.aggregate({
-                where: {
-                    userId,
-                    type: 'INCOME',
-                    createdAt: { gte: startThisMonth, lte: endThisMonth },
-                },
-                _sum: { amount: true },
-            });
-            let thisMonthSaving = await prisma.transactionHistory.aggregate({
-                where: {
-                    userId,
-                    type: 'SAVING',
-                    createdAt: { gte: startThisMonth, lte: endThisMonth },
-                },
-                _sum: { amount: true },
-            });
+            const lastMonth = getRange(-1);
+            const thisMonth = getRange(0);
 
-            lastMonthExpenses = lastMonthExpenses._sum.amount || 0;
-            lastMonthIncome = lastMonthIncome._sum.amount || 0;
-            lastMonthSaving = lastMonthSaving._sum.amount || 0;
+            const types = ['EXPENSE', 'INCOME', 'SAVING'];
+            const result = {};
 
-            thisMonthExpenses = thisMonthExpenses._sum.amount || 0;
-            thisMonthIncome = thisMonthIncome._sum.amount || 0;
-            thisMonthSaving = thisMonthSaving._sum.amount || 0;
+            const getSum = async (type, range) => {
+                const { _sum } = await prisma.transactionHistory.aggregate({
+                    where: {
+                        userId,
+                        type,
+                        createdAt: { gte: range.start, lte: range.end },
+                    },
+                    _sum: { amount: true },
+                });
+                return _sum.amount || 0;
+            };
 
-            let expenseDifference = '';
-            let incomeDifference = '';
-            let savingDifference = '';
+            const formatDifference = (current, previous) => {
+                if (previous === 0) return current;
+                const diff = Math.floor(
+                    ((current - previous) / previous) * 100
+                );
+                return (diff >= 0 ? '+' : '') + diff + '%';
+            };
 
-            if (lastMonthExpenses == 0) {
-                expenseDifference = thisMonthExpenses;
-            } else {
-                expenseDifference =
-                    Math.floor(
-                        ((thisMonthExpenses - lastMonthExpenses) /
-                            lastMonthExpenses) *
-                            100
-                    ) + '%';
+            for (const type of types) {
+                const last = await getSum(type, lastMonth);
+                const current = await getSum(type, thisMonth);
+                const key = type.toLowerCase() + 'Difference';
+                result[key] = formatDifference(current, last);
             }
 
-            if (lastMonthIncome == 0) {
-                incomeDifference = thisMonthIncome;
-            } else {
-                incomeDifference =
-                    Math.floor(
-                        ((thisMonthIncome - lastMonthIncome) /
-                            lastMonthIncome) *
-                            100
-                    ) + '%';
-            }
-
-            if (lastMonthSaving == 0) {
-                savingDifference = thisMonthSaving;
-            } else {
-                savingDifference =
-                    Math.floor(
-                        ((thisMonthSaving - lastMonthSaving) /
-                            lastMonthSaving) *
-                            100
-                    ) + '%';
-            }
-
-            if (expenseDifference[0] != '-') {
-                expenseDifference = '+' + expenseDifference;
-            }
-            if (incomeDifference[0] != '-') {
-                incomeDifference = '+' + incomeDifference;
-            }
-            if (savingDifference[0] != '-') {
-                savingDifference = '+' + savingDifference;
-            }
-
-            return res.status(200).send({
-                expenseDifference,
-                incomeDifference,
-                savingDifference,
-            });
+            return res.status(200).send(result);
         } catch (error) {
             console.log(error);
             return res.status(500).send({ message: 'Server Error!' });
         }
     }
+
     static async getSpendingTrends(req, res) {
         // returns % difference of spending for each expense, compared to the previous month.
     }
