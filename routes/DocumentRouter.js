@@ -19,6 +19,6 @@ documentRouter.post(
     DocumentController.confirmBankStatementTransactions
 );
 
-documentRouter.get('/gpt', DocumentController.promptGpt);
+// documentRouter.get('/gpt', DocumentController.promptGpt);
 
 export default documentRouter;

@@ -20,6 +20,7 @@ Table User {
   SurveyData SurveyData [not null]
   TransactionHistory TransactionHistory [not null]
   Card Card [not null]
+  ChatSession ChatSession [not null]
 }
 
 Table Income {
@@ -124,6 +125,23 @@ Table SurveyData {
   importantAppFeature String
 }
 
+Table ChatSession {
+  id String [pk]
+  userId String
+  user User
+  createdAt DateTime [default: `now()`, not null]
+  messages Message [not null]
+}
+
+Table Message {
+  id String [pk]
+  createdAt DateTime [default: `now()`, not null]
+  role String [not null]
+  content String [not null]
+  sessionId String [not null]
+  session ChatSession [not null]
+}
+
 Enum Frequency {
   DAILY
   WEEKLY
@@ -196,3 +214,7 @@ Ref: TransactionHistory.cardId > Card.id
 Ref: Notification.userId > User.id
 
 Ref: SurveyData.userId > User.id
+
+Ref: ChatSession.userId > User.id
+
+Ref: Message.sessionId > ChatSession.id

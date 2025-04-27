@@ -32,7 +32,6 @@ class AnalyticsController {
     }
 
     static async addSurveyData(req, res) {
-        // TODO: handle body.monthlyIncome separately. create a new income for that instead, and add rest to surveyData
         try {
             const userId = req.headers['user-id'];
             const data = req.body;
@@ -119,7 +118,6 @@ class AnalyticsController {
                 currentBalance,
             };
 
-            console.log(overview);
             return res.status(200).send(overview);
         } catch (error) {
             console.log(`error: ${error.message}`);
@@ -146,7 +144,6 @@ class AnalyticsController {
             totalExpenses = totalExpenses._sum.amount || 0;
 
             const budgetRemainder = totalIncome - totalExpenses;
-            console.log(budgetRemainder);
 
             return res.status(200).send({ budgetRemainder });
         } catch (error) {
@@ -186,7 +183,6 @@ class AnalyticsController {
                 });
             } else {
                 const interval = parseInt(period) - 1 || 1;
-                console.log('interval', interval);
                 transactionSummary = await prisma.$queryRaw`
                 WITH month_series AS (
                 SELECT GENERATE_SERIES(
@@ -214,8 +210,6 @@ class AnalyticsController {
                     );
                     return { ...transaction, month };
                 });
-
-                console.log(transactionSummary);
             }
 
             return res.status(200).send(transactionSummary);
@@ -341,6 +335,62 @@ class AnalyticsController {
 
     static async getSpendingTrends(req, res) {
         // returns % difference of spending for each expense, compared to the previous month.
+        try {
+            const userId = req.userId;
+
+            const now = new Date();
+            const getRange = (monthOffset) => ({
+                start: new Date(
+                    now.getFullYear(),
+                    now.getMonth() + monthOffset,
+                    1
+                ),
+                end: new Date(
+                    now.getFullYear(),
+                    now.getMonth() + monthOffset,
+                    now.getDate()
+                ),
+            });
+
+            const old = getRange(-1);
+            const latest = getRange(0);
+
+            const result = [];
+            const expenses = await prisma.expense.findMany({
+                select: { id: true, title: true, category: true },
+            });
+
+            const getSum = async (expenseId, range) => {
+                const { _sum } = await prisma.transactionHistory.aggregate({
+                    where: {
+                        userId,
+                        expenseId,
+                        createdAt: { gte: range.start, lte: range.end },
+                    },
+                    _sum: { amount: true },
+                });
+                return _sum.amount || 0;
+            };
+
+            const formatDifference = (current, previous) => {
+                if (previous === 0) return current;
+                const diff = Math.floor(
+                    ((current - previous) / previous) * 100
+                );
+                return (diff >= 0 ? '+' : '') + diff + '%';
+            };
+
+            for (const expense of expenses) {
+                const oldSum = await getSum(expense.id, old);
+                const latestSum = await getSum(expense.id, latest);
+                const difference = formatDifference(latestSum, oldSum);
+                result.push({ ...expense, difference });
+            }
+            return res.status(200).send(result);
+        } catch (error) {
+            console.log(error);
+            return res.status(500).send({ message: 'Server Error!' });
+        }
     }
 
     // i should have a general % of increase or decrease compared to month? year?

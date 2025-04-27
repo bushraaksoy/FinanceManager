@@ -100,21 +100,21 @@ class DocumentController {
         }
     }
 
-    static async promptGpt(req, res) {
-        try {
-            const response = await openai.chat.completions.create({
-                model: 'gpt-4',
-                messages: [
-                    { role: 'system', content: 'You are a helpful assistant.' },
-                    {
-                        role: 'user',
-                        content: `Create a healthy one week meal plan`,
-                    },
-                ],
-            });
-            res.status(200).send({ plan: response.choices[0].message.content });
-        } catch (error) {}
-    }
+    // static async promptGpt(req, res) {
+    //     try {
+    //         const response = await openai.chat.completions.create({
+    //             model: 'gpt-4',
+    //             messages: [
+    //                 { role: 'system', content: 'You are a helpful assistant.' },
+    //                 {
+    //                     role: 'user',
+    //                     content: `Create a healthy one week meal plan`,
+    //                 },
+    //             ],
+    //         });
+    //         res.status(200).send({ plan: response.choices[0].message.content });
+    //     } catch (error) {}
+    // }
 }
 
 export default DocumentController;

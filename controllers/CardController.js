@@ -3,7 +3,6 @@ import prisma from '../db/db.config.js';
 class CardController {
     static async getAllCards(req, res) {
         try {
-            console.log('getAllCards attempt');
             const userId = req.userId;
             const cards = await prisma.card.findMany({
                 where: { userId },

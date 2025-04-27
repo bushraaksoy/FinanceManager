@@ -66,6 +66,7 @@ model User {
   SurveyData         SurveyData[]
   TransactionHistory TransactionHistory[]
   Card               Card[]
+  ChatSession        ChatSession[]
 }
 
 model Income {
@@ -183,4 +184,21 @@ enum FinancialLiteracy {
   BEGINNER
   INTERMEDIATE
   ADVANCED
+}
+
+model ChatSession {
+  id        String    @id @default(cuid())
+  userId    String?
+  user      User?     @relation(fields: [userId], references: [id])
+  createdAt DateTime  @default(now())
+  messages  Message[]
+}
+
+model Message {
+  id        String      @id @default(cuid())
+  createdAt DateTime    @default(now())
+  role      String // 'user' or 'assistant'
+  content   String
+  sessionId String
+  session   ChatSession @relation(fields: [sessionId], references: [id])
 }

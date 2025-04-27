@@ -48,5 +48,10 @@ analyticsRouter.get(
     authenticateUserId,
     AnalyticsController.getMonthlyComparison
 );
+analyticsRouter.get(
+    '/spending-trends',
+    authenticateUserId,
+    AnalyticsController.getSpendingTrends
+);
 
 export default analyticsRouter;
