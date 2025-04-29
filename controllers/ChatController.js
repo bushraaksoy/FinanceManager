@@ -1,5 +1,6 @@
 import prisma from '../db/db.config.js';
 import { fetchUserFinanceData } from '../services/insightsService.js';
+import { formatDate } from '../utils/formatters.js';
 import { getChatCompletion } from '../utils/openai.js';
 import fs from 'fs';
 import path from 'path';
@@ -173,6 +174,12 @@ class ChatController {
             const sessions = await prisma.chatSession.findMany({
                 where: { userId },
             });
+
+            sessions = sessions.map((session) => ({
+                ...session,
+                createdAt: formatDate(session.createdAt),
+            }));
+
             return res.status(200).send(sessions);
         } catch (error) {
             console.log(error);
