@@ -23,7 +23,7 @@ export const authenticateUserId = async (req, res, next) => {
         const userId = req.headers['user-id'];
 
         if (!userId) {
-            return res.status(400).send({ message: 'userId is missing!' });
+            return res.status(400).send({ message: 'user-id is missing!' });
         }
 
         const user = await prisma.user.findUnique({ where: { id: userId } });
@@ -31,7 +31,7 @@ export const authenticateUserId = async (req, res, next) => {
         if (!user) {
             return res
                 .status(404)
-                .send({ message: 'Invalid userId. User not found.' });
+                .send({ message: 'Invalid user-id. User not found.' });
         }
         req.userId = userId;
         next();
