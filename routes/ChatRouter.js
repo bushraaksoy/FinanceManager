@@ -4,13 +4,17 @@ import { authenticateUserId } from '../middleware/authMiddleware.js';
 
 const chatRouter = Router();
 
-chatRouter.get('/sessions', ChatController.getChatSessions);
+chatRouter.get('/sessions', authenticateUserId, ChatController.getChatSessions);
 chatRouter.get('/messages', ChatController.getMessages);
 chatRouter.get(
     '/session-messages/:sessionId',
     ChatController.getSessionMessages
 );
-chatRouter.delete('/sessions', ChatController.deleteSessions);
+chatRouter.delete(
+    '/sessions',
+    authenticateUserId,
+    ChatController.deleteSessions
+);
 chatRouter.delete('/message/:messageId', ChatController.deleteMessage);
 
 chatRouter.get(

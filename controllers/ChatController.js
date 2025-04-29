@@ -169,7 +169,10 @@ class ChatController {
 
     static async getChatSessions(req, res) {
         try {
-            const sessions = await prisma.chatSession.findMany();
+            const userId = req.userId;
+            const sessions = await prisma.chatSession.findMany({
+                where: { userId },
+            });
             return res.status(200).send(sessions);
         } catch (error) {
             console.log(error);
