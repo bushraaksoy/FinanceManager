@@ -111,12 +111,14 @@ class ChatController {
 
         try {
             const userId = req.userId;
-            const sessionId = req.params['sessionId'];
+            const sessionId = req.query['sessionId'];
             const assistantPrompt = fs.readFileSync(promptPath, 'utf-8');
 
             if (!sessionId) {
                 return res.status(404).send({ error: 'sessionId is missing' });
             }
+
+            console.log(sessionId);
 
             let session = await prisma.chatSession.findUnique({
                 where: { id: sessionId, userId },
