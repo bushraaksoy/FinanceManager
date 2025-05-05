@@ -1,7 +1,7 @@
 import fs from 'fs';
 import { PdfReader } from 'pdfreader';
 import 'dotenv/config';
-import openai from './utils/openai.js';
+import openai from './openai.js';
 
 const extractTextFromPDF = (filePath) => {
     return new Promise((resolve, reject) => {

@@ -249,6 +249,23 @@ class ChatController {
             });
         }
     }
+
+    static async deleteSession(req, res) {
+        try {
+            const sessionId = req.params['sessionId'];
+            await prisma.message.deleteMany({ where: { sessionId } });
+            const sessions = await prisma.chatSession.delete({
+                where: { id: sessionId },
+            });
+
+            return res.status(200).send({
+                message: ` ${sessions.count} session deleted successfully`,
+            });
+        } catch (error) {
+            console.log(error);
+            return res.status(500).send({ message: 'Server Error' });
+        }
+    }
 }
 
 export default ChatController;

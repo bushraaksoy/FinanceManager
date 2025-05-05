@@ -29,11 +29,6 @@ monthlySaving = target_amount / duration_period
 
 #### "You will need to save 100 dollars each month"
 
-## do i need to save data for each month?
-
-nope, just a new column in the expense table, data
-check set for previous month to true, in that case i'll use date, otherwise ill just use created at
-
 ### The time when the monthlySavings is calculated:
 
 -   when the saving is first created
@@ -248,42 +243,8 @@ this will load all the expenses we have done for this month
 
 Savings
 
-# Triggers
-
--   when an expense is deleted ( handle transactions )
-
-you have a card, you need to be able to "topup" your card
-we need to somehow trigger the income being added to the card.
-
-if the income has not been added to the card then we will always see it displayed there, once we add it then it dissapears
-the incomes show up reqularly based on frequency, then user can click "topup" or add so it goes into the card.
-
-how to display non topped up amounts??
-maybe we have an endpoint to get all income transactions?
-/transactions/income
-
-then we also have
-
-/transactions/income?frequency=monthly
-
-for this we render all of them which have a "createdAt" or "date" that are > 30 days? or that are in the previous month (month-1 % 12)?
-
-/transactions/income?frequency=weekly
-
-for this we render all of them which have a "createdAt" or "date" that are > 7 days?
-
-sounds good.
-
-maybe i have an endpoint like /incomes/pendingIncomes ?? or
-
     // GET
     // /incomeOverview
     // /incomeTrend
     // /expenseOverview
     // /expenseTrend
-
-TODO
-
--   implement analytics endpoints with 6 months, 1 year tractions - DONE
--   implement analytics endpoints with 6 months, 1 year pie chart - DONE
--   make an endpoint for expense category stats (spending ranking)
