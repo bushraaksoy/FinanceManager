@@ -161,11 +161,11 @@ class AnalyticsController {
             if (period == '1') {
                 transactionSummary = await prisma.$queryRaw`
                 WITH date_series AS (
-                SELECT GENERATE_SERIES(
-                    DATE_TRUNC('month', CURRENT_DATE), 
-                    DATE_TRUNC('month', CURRENT_DATE) + INTERVAL '1 month' - INTERVAL '1 day',
+                    SELECT GENERATE_SERIES(
+                    CURRENT_DATE - INTERVAL '29 days',
+                    CURRENT_DATE,
                     INTERVAL '1 day'
-                ) AS date
+                )AS date
                 )
                 SELECT 
                     date_series.date AS date,
