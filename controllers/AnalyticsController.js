@@ -220,27 +220,20 @@ class AnalyticsController {
     }
 
     static async getTransactionSummary(req, res) {
+        //! GOOD DATE CALCULATIONS
         try {
             const userId = req.userId;
             const period = req.query?.period;
-            const interval = period - 1 || 0;
+            const interval = period || 1;
             const now = new Date();
-            const startPeriod = new Date(
-                now.getFullYear(),
-                now.getMonth() - interval,
-                1
-            );
-            const endPeriod = new Date(
-                now.getFullYear(),
-                now.getMonth() + 1,
-                1
-            );
+            const startPeriod = new Date();
+            startPeriod.setMonth(now.getMonth() - interval);
 
             let totalSpending = await prisma.transactionHistory.aggregate({
                 where: {
                     userId,
                     type: 'EXPENSE',
-                    createdAt: { gte: startPeriod, lt: endPeriod },
+                    createdAt: { gte: startPeriod, lte: now },
                 },
                 _sum: { amount: true },
             });
@@ -248,7 +241,7 @@ class AnalyticsController {
                 where: {
                     userId,
                     type: 'INCOME',
-                    createdAt: { gte: startPeriod, lt: endPeriod },
+                    createdAt: { gte: startPeriod, lte: now },
                 },
                 _sum: { amount: true },
             });
@@ -257,7 +250,7 @@ class AnalyticsController {
                 where: {
                     userId,
                     type: 'SAVING',
-                    createdAt: { gte: startPeriod, lt: endPeriod },
+                    createdAt: { gte: startPeriod, lte: now },
                 },
                 _sum: { amount: true },
             });
