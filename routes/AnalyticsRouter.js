@@ -25,6 +25,11 @@ analyticsRouter.get(
     AnalyticsController.getTotalExpenses
 );
 analyticsRouter.get(
+    '/balance',
+    authenticateUserId,
+    AnalyticsController.getCurrentBalance
+);
+analyticsRouter.get(
     '/balance-overview',
     authenticateUserId,
     AnalyticsController.getBalanceOverview

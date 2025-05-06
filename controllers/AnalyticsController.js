@@ -61,6 +61,25 @@ class AnalyticsController {
         }
     }
 
+    static async getCurrentBalance(req, res) {
+        try {
+            const userId = req.userId;
+            let currentBalance = await prisma.card.aggregate({
+                where: { userId },
+                _sum: { balance: true },
+            });
+
+            currentBalance = currentBalance._sum.balance || 0;
+
+            return res.status(200).send({ currentBalance });
+        } catch (error) {
+            console.log(`error: ${error.message}`);
+            return res.status(500).send({
+                error: 'A server error occured getting current balance',
+            });
+        }
+    }
+
     static async getBalanceOverview(req, res) {
         try {
             const userId = req.headers['user-id'];
