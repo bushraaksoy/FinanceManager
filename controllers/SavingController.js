@@ -18,10 +18,10 @@ class SavingController {
     static async getSaving(req, res) {
         try {
             const userId = req.userId;
-            const { savingId } = req.params;
+            const savingId = req.savingId;
 
             const saving = await prisma.saving.findUnique({
-                where: { id: +savingId, userId },
+                where: { id: savingId, userId },
             });
             res.status(200).send({ saving });
         } catch (error) {
@@ -62,10 +62,10 @@ class SavingController {
     static async updateSaving(req, res) {
         try {
             const userId = req.userId;
-            const { savingId } = req.params;
+            const savingId = req.savingId;
             const data = req.body;
             const saving = await prisma.saving.update({
-                where: { id: +savingId, userId },
+                where: { id: savingId, userId },
                 data,
             });
             res.status(200).send({
@@ -82,14 +82,33 @@ class SavingController {
     }
     static async deleteSaving(req, res) {
         try {
-            const { savingId } = req.params;
+            const savingId = req.savingId;
             const saving = await prisma.saving.delete({
-                where: { id: +savingId, userId },
+                where: { id: savingId, userId },
             });
             res.status(200).send({
                 message: 'Saving deleted successfully',
                 saving,
             });
+        } catch (error) {
+            console.error(error);
+            res.status(500).send({
+                message: 'Server Error',
+                error: error.message,
+            });
+        }
+    }
+
+    static async getSavingTransactions(req, res) {
+        try {
+            const userId = req.userId;
+            const savingId = req.savingId;
+            console.log(savingId);
+            const transactions = await prisma.transactionHistory.findMany({
+                where: { userId, savingId },
+            });
+
+            return res.status(200).send(transactions);
         } catch (error) {
             console.error(error);
             res.status(500).send({

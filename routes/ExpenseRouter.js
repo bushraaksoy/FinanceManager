@@ -1,32 +1,37 @@
 import { Router } from 'express';
 import { ExpenseController } from '../controllers/index.js';
 import { authenticateUserId } from '../middleware/authMiddleware.js';
+import { validateExpenseId } from '../middleware/expenseMiddleware.js';
 
 const expenseRouter = Router();
 
 // Expense
+expenseRouter.get('/', authenticateUserId, ExpenseController.getAllExpenses);
+expenseRouter.post('/', authenticateUserId, ExpenseController.addExpense);
 expenseRouter.get(
-    '/expenses',
-    authenticateUserId,
-    ExpenseController.getAllExpenses
-);
-expenseRouter.post(
-    '/expenses',
-    authenticateUserId,
-    ExpenseController.addExpense
-);
-expenseRouter.get(
-    '/expenses/:expenseId',
+    '/:expenseId',
     authenticateUserId,
     ExpenseController.getExpense
 );
+expenseRouter.get(
+    '/:expenseId',
+    authenticateUserId,
+    validateExpenseId,
+    ExpenseController.getExpense
+);
+expenseRouter.get(
+    '/:expenseId/transactions',
+    authenticateUserId,
+    validateExpenseId,
+    ExpenseController.getExpenseTransactions
+);
 expenseRouter.put(
-    '/expenses/:expenseId',
+    '/:expenseId',
     authenticateUserId,
     ExpenseController.updateExpense
 );
 expenseRouter.delete(
-    '/expenses/:expenseId',
+    '/:expenseId',
     authenticateUserId,
     ExpenseController.deleteExpense
 );

@@ -195,6 +195,24 @@ class IncomeController {
             });
         }
     }
+
+    static async getIncomeTransactions(req, res) {
+        try {
+            const userId = req.userId;
+            const incomeId = req.incomeId;
+            const transactions = await prisma.transactionHistory.findMany({
+                where: { userId, incomeId },
+            });
+
+            return res.status(200).send(transactions);
+        } catch (error) {
+            console.error(error);
+            res.status(500).send({
+                message: 'Server Error getting income transactions',
+                error: error.message,
+            });
+        }
+    }
 }
 
 export default IncomeController;

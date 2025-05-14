@@ -75,6 +75,39 @@ class CardController {
         }
     }
 
+    static async getCardTransactions(req, res) {
+        try {
+            const userId = req.userId;
+            const cardId = req.params['cardId'];
+
+            if (!cardId) {
+                return res.status(400).send({ message: 'cardId is missing!' });
+            }
+
+            const card = await prisma.card.findUnique({
+                where: { id: +cardId, userId },
+            });
+
+            if (!card) {
+                return res
+                    .status(404)
+                    .send({ message: 'Invalid cardId. Card does not exist.' });
+            }
+
+            const transactions = await prisma.transactionHistory.findMany({
+                where: { userId, cardId: +cardId },
+            });
+
+            return res.status(200).send(transactions);
+        } catch (error) {
+            console.error(error);
+            res.status(500).send({
+                message: 'Server Error getting card transactions',
+                error: error.message,
+            });
+        }
+    }
+
     static async fixThings(req, res) {
         try {
             console.log('Starting to fix things...');

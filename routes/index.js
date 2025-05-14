@@ -23,7 +23,7 @@ router.use('/auth', authRouter);
 router.use('/users', userRouter);
 router.use('/profile', profileRouter);
 router.use('/incomes', incomeRouter);
-router.use('', expenseRouter);
+router.use('/expenses', expenseRouter);
 router.use('/savings', savingsRouter);
 router.use('/transactions', transactionRouter);
 router.use('/analytics', analyticsRouter);

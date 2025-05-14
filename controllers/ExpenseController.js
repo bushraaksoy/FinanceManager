@@ -185,6 +185,24 @@ class ExpenseController {
             });
         }
     }
+
+    static async getExpenseTransactions(req, res) {
+        try {
+            const userId = req.userId;
+            const expenseId = req.expenseId;
+            const transactions = await prisma.transactionHistory.findMany({
+                where: { userId, expenseId },
+            });
+
+            return res.status(200).send(transactions);
+        } catch (error) {
+            console.error(error);
+            res.status(500).send({
+                message: 'Server Error getting expense transactions',
+                error: error.message,
+            });
+        }
+    }
 }
 
 export default ExpenseController;
