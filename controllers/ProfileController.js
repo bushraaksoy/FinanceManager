@@ -6,6 +6,13 @@ class ProfileController {
         try {
             const userId = req.userId;
 
+            console.log(req.ip);
+            let ip =
+                req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+            if (ip.startsWith('::ffff:')) {
+                ip = ip.replace('::ffff:', '');
+            }
+
             const profile = await prisma.user.findUnique({
                 where: { id: userId },
                 select: {

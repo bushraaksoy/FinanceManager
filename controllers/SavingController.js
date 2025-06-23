@@ -38,7 +38,6 @@ class SavingController {
             const data = req.body;
             console.log('data ', data);
             const savedAmount = 0;
-            // TODO: saved_amount = 0 (defualt) calculate MonthlySaving
             const monthlySaving = calculateMonthlySaving(
                 data.targetAmount,
                 savedAmount,
@@ -83,6 +82,7 @@ class SavingController {
     static async deleteSaving(req, res) {
         try {
             const savingId = req.savingId;
+            const userId = req.userId;
             const saving = await prisma.saving.delete({
                 where: { id: savingId, userId },
             });

@@ -118,7 +118,7 @@ model Saving {
   title              String
   description        String?
   targetAmount       Float
-  savedAmount        Float?
+  savedAmount        Float?               @default(0)
   monthlySaving      Float?
   dueDate            DateTime?
   createdAt          DateTime             @default(now())
@@ -152,8 +152,6 @@ model TransactionHistory {
 
   cardId Int?
   card   Card? @relation(fields: [cardId], references: [id])
-
-  // TODO: Do we add a title to our transaction??? the bank statemnet and so on
 }
 
 model Notification {
@@ -194,11 +192,18 @@ model ChatSession {
   messages  Message[]
 }
 
+enum MessageType {
+  regular
+  userData
+  insight
+}
+
 model Message {
-  id        String      @id @default(cuid())
-  createdAt DateTime    @default(now())
-  role      String // 'user' or 'assistant'
-  content   String
-  sessionId String
-  session   ChatSession @relation(fields: [sessionId], references: [id])
+  id          String       @id @default(cuid())
+  createdAt   DateTime     @default(now())
+  role        String // 'user' or 'assistant'
+  messageType MessageType? @default(regular)
+  content     String
+  sessionId   String
+  session     ChatSession  @relation(fields: [sessionId], references: [id])
 }

@@ -185,15 +185,6 @@ Delete user and return a success message.
 
 ---
 
-## 📌 TODOs
-
--   Handle cascading deletions: update card balances when a card or expense is deleted.
--   Ensure data consistency when deleting linked records.
--   Improve file upload with proper validation and response structure.
--   Automate income and savings tracking via parsed transactions.
-
----
-
 ## 🛠 Development
 
 ### Install dependencies

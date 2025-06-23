@@ -72,7 +72,7 @@ Table Saving {
   title String [not null]
   description String
   targetAmount Float [not null]
-  savedAmount Float
+  savedAmount Float [default: 0]
   monthlySaving Float
   dueDate DateTime
   createdAt DateTime [default: `now()`, not null]
@@ -137,6 +137,7 @@ Table Message {
   id String [pk]
   createdAt DateTime [default: `now()`, not null]
   role String [not null]
+  messageType MessageType [default: 'regular']
   content String [not null]
   sessionId String [not null]
   session ChatSession [not null]
@@ -189,6 +190,12 @@ Enum FinancialLiteracy {
   BEGINNER
   INTERMEDIATE
   ADVANCED
+}
+
+Enum MessageType {
+  regular
+  userData
+  insight
 }
 
 Ref: Income.userId > User.id

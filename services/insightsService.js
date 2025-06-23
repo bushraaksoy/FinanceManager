@@ -55,6 +55,7 @@ export const fetchUserFinanceData = async (userId) => {
 
         let data = { incomes, expenses, savings, cards, transactions };
         data = JSON.stringify(data, null);
+
         return data;
     } catch (error) {
         console.log('Error fetching user finance data: ', error.message);

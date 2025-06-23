@@ -1,10 +1,6 @@
 import prisma from '../db/db.config.js';
 
 class IncomeController {
-    // TODO: get income status of all incomes and balance left over (you can minus from all transactions made from that incomeId)
-    //! TODO: adding and updating income should check if it has cardId, if so we need to add the balance to the card
-    //! TODO: when a user makes a transaction they select a card if they have more than one card
-
     static async getAllIncomes(req, res) {
         try {
             console.log('getting all incomes');

@@ -15,8 +15,16 @@ class ChatController {
         );
 
         try {
+            // create session in db
+            // send first text about finance assistant role - let it know that it will receive data
+            // send second message about app features
+            // send third  message about users data
+            // when user requests insight, send only last months data(transactions only?) as fresh data for the assistant.
+            // how often to update the userData message????
+
             const userId = req.userId;
             const assistantPrompt = fs.readFileSync(promptPath, 'utf-8');
+
             const session = await prisma.chatSession.create({
                 data: { userId },
             });
@@ -92,8 +100,8 @@ class ChatController {
                 sessionId: session.id,
                 assistantMessage,
             });
-        } catch (err) {
-            console.error(err);
+        } catch (error) {
+            console.error(error);
             res.status(500).json({
                 message: 'Error sending message',
                 error: error.message,
@@ -264,6 +272,20 @@ class ChatController {
         } catch (error) {
             console.log(error);
             return res.status(500).send({ message: 'Server Error' });
+        }
+    }
+
+    static async getUserData(req, res) {
+        try {
+            const userId = req.userId;
+            const data = await fetchUserFinanceData(userId);
+            console.log(data);
+            res.status(200).send({ message: 'Check user data in console.' });
+        } catch (error) {
+            console.log('Error getting user data: ', error);
+            return res
+                .status(500)
+                .send({ message: 'Server error getting user data' });
         }
     }
 }

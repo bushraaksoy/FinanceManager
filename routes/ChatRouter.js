@@ -30,5 +30,6 @@ chatRouter.post(
     authenticateUserId,
     ChatController.sendMessage
 );
+chatRouter.get('/user-data', authenticateUserId, ChatController.getUserData);
 
 export default chatRouter;
