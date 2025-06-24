@@ -217,7 +217,11 @@ class ChatController {
             const { sessionId } = req.params;
             console.log(sessionId);
             const messages = await prisma.message.findMany({
-                where: { sessionId, role: { in: ['user', 'assistant'] } },
+                where: {
+                    sessionId,
+                    role: { in: ['user', 'assistant'] },
+                },
+                orderBy: { createdAt: 'asc' },
             });
             console.log(messages);
             return res.status(200).send(messages);
@@ -286,6 +290,21 @@ class ChatController {
             return res
                 .status(500)
                 .send({ message: 'Server error getting user data' });
+        }
+    }
+
+    static async insertSessionMessages(req, res) {
+        try {
+            const chatMessages = req.body.messages;
+            const userId = req.body.userId;
+            await prisma.message.createMany({
+                where: userId,
+                data: chatMessages,
+            });
+            return res.status(200).send({ message: 'added successfully' });
+        } catch (error) {
+            console.log(error);
+            return res.status(500).send({ message: 'server error' });
         }
     }
 }

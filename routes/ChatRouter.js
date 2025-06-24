@@ -32,4 +32,9 @@ chatRouter.post(
 );
 chatRouter.get('/user-data', authenticateUserId, ChatController.getUserData);
 
+chatRouter.post(
+    '/insert-session-messages',
+    ChatController.insertSessionMessages
+);
+
 export default chatRouter;
